@@ -73,7 +73,6 @@ $(document).ready(function() {
           <a class="over-area color-1" href="javascript:void(0)" onClick="rubik.showModal(this)" data-target="${project.target}">
             <div class="content">
               <h4>${project.title}</h4>
-              <p>Click for more... </p>
             </div>
           </a>
         </div>
