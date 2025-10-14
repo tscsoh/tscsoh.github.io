@@ -70,11 +70,6 @@ $(document).ready(function() {
       <div class="col-lg-4 col-md-6 col-sm-6">
         <div class="project add-animation animation-${(index % 3) + 1}">
           <img src="${project.src}" style="width: 100%; object-fit: cover; height: 400px;" />
-          <a class="over-area color-1" href="javascript:void(0)" onClick="rubik.showModal(this)" data-target="${project.target}">
-            <div class="content">
-              <h4>${project.title}</h4>
-            </div>
-          </a>
         </div>
       </div>
     `;
