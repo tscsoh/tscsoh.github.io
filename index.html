@@ -15,6 +15,38 @@
   <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
   <link href="assets/css/fonts/pe-icon-7-stroke.css" rel="stylesheet">
   <link href="assets/css/fonts/fonts.css" rel="stylesheet" />
+  <style>
+    .repo-link {
+      color: #c9a52a;
+      font-family: monospace;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
+    }
+    .repo-link:hover {
+      color: #c9a52a;
+      text-shadow: 0 0 8px rgba(201, 165, 42, 0.7), 0 0 20px rgba(201, 165, 42, 0.4);
+      border-bottom: 1px solid #c9a52a;
+      text-decoration: none;
+    }
+  @media (max-width: 768px) {
+    .repo-link {
+      padding: 0 24px;
+      display: inline-block;
+    }
+    .intro-video-wrap {
+      overflow: hidden;
+      height: 56vw;
+    }
+    .intro-video-wrap video {
+      width: 160% !important;
+      margin-left: -30%;
+      margin-top: -8%;
+    }
+  }
+  </style>
 </head>
 
 <body id="skrollr-body">
@@ -79,11 +111,19 @@
     </div>
 
     <div class="section" id="intro-video" style="background:#000; line-height:0; padding:0; position:relative;">
-      <video autoplay muted loop playsinline style="width:100%; height:auto; display:block;">
-        <source src="assets/video/Screen%20Recording%202026-03-06%20at%207.45.17%E2%80%AFAM.mp4" type="video/mp4">
-      </video>
+      <div class="intro-video-wrap">
+        <video autoplay muted loop playsinline style="width:100%; height:auto; display:block;">
+          <source src="assets/video/Screen%20Recording%202026-03-06%20at%207.45.17%E2%80%AFAM.mp4" type="video/mp4">
+        </video>
+      </div>
       <a href="" data-scroll="true" data-id="#clients" class="scroll-arrow hidden-xs hidden-sm">
         <i class="fa fa-angle-down"></i>
+      </a>
+    </div>
+
+    <div style="background:#111; text-align:center; padding:18px 0;">
+      <a href="https://github.com/tscsoh/sigint-brief" target="_blank" rel="noopener noreferrer" class="repo-link">
+        <i class="fa fa-github" style="margin-right:8px;"></i>View Source — github.com/tscsoh/sigint-brief
       </a>
     </div>
 
