@@ -42,6 +42,14 @@
       transform-origin: 50% 22%;
       filter: brightness(0.45) contrast(1.08) saturate(0.85);
     }
+    /* Below ~992px width, script.js swaps the <img> above for a plain
+       background-image div (see checkResponsiveImage in script.js) —
+       it needs the same crop/darken treatment applied here separately. */
+    #home.parallax .responsive-background {
+      background-position: 50% 15%;
+      background-size: 220% auto;
+      filter: brightness(0.45) contrast(1.08) saturate(0.85);
+    }
   @media (max-width: 768px) {
     .repo-link {
       padding: 0 24px;
@@ -100,7 +108,7 @@
   <div class="wrapper">
     <div class="section section-header">
       <div class="parallax filter filter-color-4" id="home">
-        <img src="assets/img/Portrait.png" />
+        <img src="assets/img/Portrait.png" data-zoom="1.6" />
         <div class="container">
           <div class="content content-with-opacity">
             <h1 class="responsive-small">AI Orchestration Architect</h1>

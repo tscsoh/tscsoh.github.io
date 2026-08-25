@@ -391,9 +391,10 @@ rubik = {
                 var parent_top = $elem.offset().top;
                 var window_bottom = $(window).scrollTop();
                 var $image = $elem.children('img');
+                var zoom = $image.data('zoom') || 1;
 
                 oVal = ((window_bottom - parent_top) / 3);
-                $image.css('transform', 'translate3d(0px, ' + oVal + 'px, 0px)');
+                $image.css('transform', 'translate3d(0px, ' + oVal + 'px, 0px) scale(' + zoom + ')');
             }
         });
 
