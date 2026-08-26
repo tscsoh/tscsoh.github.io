@@ -81,13 +81,15 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 .section-header h1 {
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
 }
-/* Slim-Joe (the hero display font) only ships one weight — thin — and
-   there's no bold face to fall back on, so font-weight: bold does
-   nothing real (browsers can only fake-skew it). At the smaller size
-   mobile renders it at, the thin strokes get lost. A slim text-stroke
-   in the same color visually thickens the actual glyphs instead. */
+/* Slim-Joe (the hero display font, also used for the "Todd Swepston"
+   navbar brand) only ships one weight — thin — and there's no bold
+   face to fall back on, so font-weight: bold does nothing real
+   (browsers can only fake-skew it). At the smaller size mobile
+   renders it at, the thin strokes get lost. A slim text-stroke in
+   the same color visually thickens the actual glyphs instead. */
 @media (max-width: 768px) {
-  #home .section-header h1 {
+  .section-header h1,
+  .navbar-brand {
     -webkit-text-stroke: 0.6px currentColor;
     text-stroke: 0.6px currentColor;
   }
