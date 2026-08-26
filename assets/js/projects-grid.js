@@ -37,7 +37,7 @@ $(document).ready(function() {
     projectHtml += `
       <div class="col-lg-4 col-md-6 col-sm-6">
         <div class="project add-animation animation-${(index % 3) + 1}">
-          <img src="${project.src}" style="width: 100%; object-fit: cover; height: 400px;" loading="lazy" decoding="async" />
+          <img src="${project.src}" style="width: 100%; object-fit: cover; height: 400px;" loading="lazy" decoding="async" data-title="${project.title}" />
           <div class="project-caption"><span>${project.title}</span></div>
         </div>
       </div>

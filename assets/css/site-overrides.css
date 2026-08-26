@@ -157,6 +157,91 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 .section-with-hover .project img { transition: transform 0.6s ease, filter 0.6s ease; }
 .section-with-hover .project:hover img { transform: scale(1.035); }
 
+/* Both the two featured images and the 21-tile grid open in the
+   lightbox below on click. */
+#projects .project,
+.section-with-hover .project {
+  cursor: pointer;
+}
+
+/* ---- lightbox -------------------------------------------------
+   Paired with assets/js/lightbox.js. Click any project image to
+   view it full-browser; close via the X, the backdrop, or Escape. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 6vh 5vw;
+  background: rgba(4, 4, 4, 0.94);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.lightbox.open {
+  opacity: 1;
+  visibility: visible;
+}
+.lightbox figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
+  max-height: 100%;
+  transform: scale(0.97);
+  transition: transform 0.3s ease;
+}
+.lightbox.open figure {
+  transform: scale(1);
+}
+.lightbox img {
+  max-width: 88vw;
+  max-height: 78vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.lightbox figcaption {
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: center;
+  min-height: 1em;
+}
+.lightbox-close {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.3s ease;
+}
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: rotate(90deg);
+}
+@media (max-width: 540px) {
+  .lightbox-close { top: 14px; right: 14px; width: 40px; height: 40px; }
+}
+
 /* ---- small screens ------------------------------------------ */
 @media (max-width: 768px) {
   .repo-link {

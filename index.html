@@ -153,12 +153,12 @@
       <div class="row">
         <div class="col-md-6">
           <div class="project add-animation animation-1">
-            <img src="assets/img/KIASimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" />
+            <img src="assets/img/KIASimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" data-title="KIA SimpleConnect" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="project add-animation animation-2">
-            <img src="assets/img/HomeSimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" />
+            <img src="assets/img/HomeSimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" data-title="Home SimpleConnect" />
           </div>
         </div>
       </div>
@@ -234,6 +234,14 @@
     </footer>
   </div> <!-- end wrapper -->
 
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Project preview">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <figure>
+      <img id="lightboxImg" src="" alt="" />
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+  </div>
+
 </body>
 <!--   core js files    -->
 <script src="assets/js/jquery-1.11.2.min.js" type="text/javascript"></script>
@@ -253,6 +261,9 @@
 
 <!--   hero title load-in sequence   -->
 <script type="text/javascript" src="assets/js/hero-intro.js"></script>
+
+<!--   project image lightbox   -->
+<script type="text/javascript" src="assets/js/lightbox.js"></script>
 
 <!--   D3 architecture diagram: enterprise orchestration over local LLMs   -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
