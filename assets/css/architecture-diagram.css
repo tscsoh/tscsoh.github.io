@@ -14,6 +14,23 @@
 }
 #arch-diagram svg { width: 100%; height: auto; display: block; }
 
+/* Below tablet width, shrinking the SVG to fit the screen makes its
+   labels unreadable. Instead of scaling down, render it at a fixed
+   readable size and let the container scroll horizontally — same
+   diagram, same text size, just wider than the screen. */
+@media (max-width: 768px) {
+  #arch-diagram {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+  }
+  #arch-diagram svg {
+    width: 900px;
+    max-width: none;
+  }
+}
+
 #arch-diagram .arch-node rect {
   fill: #ffffff;
   stroke-width: 1.5px;
@@ -25,7 +42,13 @@
 #arch-diagram .arch-node text { fill: #232323; font-family: 'Helvetica Neue', Arial, sans-serif; pointer-events: none; }
 #arch-diagram .arch-node .arch-sub { fill: #999999; }
 #arch-diagram .arch-node.dim { opacity: 0.28; }
-#arch-diagram .arch-node { cursor: pointer; transition: opacity 0.25s ease; }
+#arch-diagram .arch-node { cursor: pointer; }
+/* Only the hover dim/undim should ease — added after the entrance
+   animation finishes. A blanket transition here fights d3's own
+   opacity transition during entrance: every interpolated attribute
+   frame restarts a new CSS transition toward a target that's already
+   moved on, so the node never visibly reaches full opacity. */
+#arch-diagram.ready .arch-node { transition: opacity 0.25s ease; }
 #arch-diagram .arch-node > g { transition: transform 0.25s ease-out; }
 
 #arch-diagram .arch-badge circle { transition: opacity 0.25s; }

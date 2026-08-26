@@ -103,7 +103,8 @@
   }
 
   var container = document.getElementById("arch-diagram");
-  if (!container || typeof d3 === "undefined") { return; }
+  if (!container) { return; }
+  if (typeof d3 === "undefined") { return; }
 
   var svg = d3.select(container).append("svg")
     .attr("viewBox", "0 0 " + W + " " + H)
@@ -343,6 +344,10 @@
         startPulse(this, trunk ? "#f2d9a8" : linkColor(l), trunk ? 4.6 : 3, trunk ? 1300 : 2100);
       });
     }, 1100);
+
+    setTimeout(function () {
+      container.classList.add("ready");
+    }, order.data * 150 + 520 + 50);
   }
 
   if ("IntersectionObserver" in window) {
@@ -354,5 +359,14 @@
     io.observe(container);
   } else {
     playIn();
+  }
+
+  // On phones the diagram scrolls sideways (see the mobile rule in
+  // architecture-diagram.css). Open on the horizontal center rather
+  // than the left edge.
+  if (window.innerWidth <= 768) {
+    requestAnimationFrame(function () {
+      container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+    });
   }
 })();

@@ -30,6 +30,23 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 /* ---- hero portrait ------------------------------------------
    Crop/darken the hero photo to match the previous photo's
    moody, tightly-cropped treatment. */
+/* Mobile browsers resize their visible viewport as the address bar
+   collapses/expands on scroll, and plain vh units are recalculated
+   against that changing height — so a section sized in vh visibly
+   grows or shrinks a moment into every scroll. svh ("small viewport
+   height") is pinned to the viewport size when browser chrome is
+   fully shown and never changes, eliminating the jump. Declared
+   after the vh fallback so unsupported browsers still get a height. */
+#home.parallax {
+  height: 100vh;
+  height: 100svh;
+}
+@media (max-width: 768px) {
+  #home.parallax {
+    height: 80vh;
+    height: 80svh;
+  }
+}
 #home.parallax > img {
   object-fit: cover;
   object-position: 50% 22%;
@@ -39,8 +56,18 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 }
 /* Below ~992px width, script.js swaps the <img> above for a plain
    background-image div (see checkResponsiveImage in script.js) —
-   it needs the same crop/darken treatment applied here separately. */
+   it needs the same crop/darken treatment applied here separately.
+   The template gives this div its own unconditional height: 80vh
+   (assets/css/styles.css), while its parent only drops to 80vh under
+   a max-width: 768px media query — so on any viewport from ~769 to
+   991px wide (tablets, large phones) the two heights mismatch and a
+   gap opens below the hero, showing the div's tan fallback
+   background-color. Tying height to the parent (100%) and matching
+   that fallback color to the hero makes the seam impossible at any
+   width, and invisible even if a sub-pixel gap ever does occur. */
 #home.parallax .responsive-background {
+  height: 100%;
+  background-color: #04060a;
   background-position: 50% 15%;
   background-size: 220% auto;
   filter: brightness(0.3) contrast(1.15) saturate(0.7);
@@ -53,6 +80,17 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 #home .section-header h1,
 .section-header h1 {
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+/* Slim-Joe (the hero display font) only ships one weight — thin — and
+   there's no bold face to fall back on, so font-weight: bold does
+   nothing real (browsers can only fake-skew it). At the smaller size
+   mobile renders it at, the thin strokes get lost. A slim text-stroke
+   in the same color visually thickens the actual glyphs instead. */
+@media (max-width: 768px) {
+  #home .section-header h1 {
+    -webkit-text-stroke: 0.6px currentColor;
+    text-stroke: 0.6px currentColor;
+  }
 }
 
 /* De-emphasize the hero contact info from two giant stacked lines
@@ -226,8 +264,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   border: 1px solid rgba(255, 255, 255, 0.3);
   background: rgba(255, 255, 255, 0.05);
   color: #fff;
-  font-size: 26px;
-  line-height: 1;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
