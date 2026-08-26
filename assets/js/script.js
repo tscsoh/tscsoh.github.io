@@ -143,7 +143,7 @@ $(window).on('scroll', function () {
         rubik.checkScrollForParallax();
     }
 
-    if (content_opacity == 1) {
+    if (window_width > 992 && content_opacity == 1) {
         rubik.checkScrollForContentTransitions();
     }
 });
