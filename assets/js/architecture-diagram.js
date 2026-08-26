@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  var W = 1300, H = 700;
+  var W = 1300, H = 620;
 
   // ---- palette sampled from the UX-process diagram directly below this
   // section (Discover/Define/Prototype/Design/Deliver), so the two feel
@@ -50,19 +50,19 @@
     { id: "observability", label: "Observability", icon: "", sub: "Logs · Traces · Metrics",        x: 1140, y: 408, w: 210, h: 64, type: "service", accent: PALETTE.obs,
       desc: "Structured logging, distributed tracing and metrics for every step of a request, required for debugging and audit." },
 
-    { id: "llm-a",       label: "Llama-3 70B",   icon: "", sub: "GPU A · vLLM",    x: 160, y: 524, w: 210, h: 64, type: "llm", accent: PALETTE.router,
+    { id: "llm-a",       label: "Llama-3 70B",   icon: "", sub: "GPU A · vLLM",    x: 103, y: 524, w: 100, h: 64, type: "llm", accent: PALETTE.router, compact: true,
       desc: "Larger self-hosted model for complex reasoning, served on-prem via vLLM. No request or token ever leaves the network." },
-    { id: "llm-b",       label: "Llama-3 8B",    icon: "", sub: "GPU B · fast path", x: 160, y: 610, w: 210, h: 64, type: "llm", accent: PALETTE.router,
+    { id: "llm-b",       label: "Llama-3 8B",    icon: "", sub: "GPU B · fast path", x: 217, y: 524, w: 100, h: 64, type: "llm", accent: PALETTE.router, compact: true,
       desc: "Smaller, faster self-hosted model for simple/low-latency turns, served via Ollama on a second GPU node." },
     { id: "vector-db",   label: "Vector DB",     icon: "", sub: "pgvector · embeddings", x: 405, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.rag,
       desc: "Stores document embeddings for retrieval-augmented generation, running as a Postgres extension inside the private network." },
-    { id: "internal-api", label: "Internal APIs", icon: "", sub: "CRM · ERP · Warehouse", x: 650, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.tools,
-      desc: "Read/write access to internal systems of record, called only through the tool sandbox." },
-    { id: "external-api", label: "External APIs", icon: "", sub: "Allow-listed · egress proxy", x: 650, y: 610, w: 210, h: 64, type: "data", accent: PALETTE.tools,
+    { id: "internal-api", label: "Internal APIs", icon: "", sub: "CRM · ERP · WMS", x: 592, y: 524, w: 108, h: 64, type: "data", accent: PALETTE.tools, compact: true,
+      desc: "Read/write access to internal systems of record — CRM, ERP and warehouse management — called only through the tool sandbox." },
+    { id: "external-api", label: "External APIs", icon: "", sub: "Allow-listed only", x: 708, y: 524, w: 108, h: 64, type: "data", accent: PALETTE.tools, compact: true,
       desc: "A narrow, explicitly allow-listed set of third-party APIs, reached through an egress proxy for auditability." },
     { id: "audit",       label: "Audit Log",     icon: "", sub: "SIEM · immutable trail", x: 895, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.guard,
       desc: "Immutable, append-only record of every guardrail decision, feeding the SIEM for compliance review." },
-    { id: "datastore",   label: "Redis + Postgres", icon: "", sub: "Session & conversation state", x: 1140, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.obs,
+    { id: "datastore",   label: "Redis + Postgres", icon: "", sub: "Session & conversation state", x: 1140, y: 282, w: 200, h: 64, type: "data", accent: PALETTE.core,
       desc: "Redis for short-lived session state, Postgres for durable conversation history. Both private, both inside the boundary." }
   ];
 
@@ -74,13 +74,20 @@
     { s: "orchestrator", t: "tools" },
     { s: "orchestrator", t: "guardrails" },
     { s: "orchestrator", t: "observability" },
+    // Not chains — the router picks ONE of these two models per request
+    // ("routes by task, cost & latency"), and the tool sandbox calls
+    // EITHER an internal system or an allow-listed external API. Both
+    // pairs are peer destinations, drawn side by side, each with its
+    // own direct link from the parent.
     { s: "model-router", t: "llm-a", animated: true },
-    { s: "llm-a", t: "llm-b" },
+    { s: "model-router", t: "llm-b" },
     { s: "rag", t: "vector-db", animated: true },
     { s: "tools", t: "internal-api" },
-    { s: "internal-api", t: "external-api" },
+    { s: "tools", t: "external-api" },
     { s: "guardrails", t: "audit" },
-    { s: "observability", t: "datastore" }
+    // Session/conversation state is the orchestrator's own concern
+    // (see its "Session Ctx" subtitle) — not Observability's.
+    { s: "orchestrator", t: "datastore", side: true }
   ];
 
   var byId = {};
@@ -100,6 +107,39 @@
     var tx = t.x, ty = t.y - t.h / 2;
     var midY = sy + (ty - sy) / 2;
     return "M" + sx + "," + sy + " V" + midY + " H" + tx + " V" + ty;
+  }
+
+  // Same elbow shape, shifted sideways by `off` — used only as an
+  // invisible guide path so the request pulse and the response pulse
+  // each get their own lane instead of overlapping on the visible line.
+  // The elbow has two orientations (vertical run, horizontal run), so
+  // "sideways" means different axes for each: the two vertical segments
+  // shift in x, the horizontal segment shifts in y — offsetting only x
+  // (as an earlier version did) left the horizontal segment unshifted,
+  // so both lanes still overlapped anywhere the link ran horizontally.
+  function elbowOffset(s, t, off) {
+    var sx = s.x + off, sy = s.y + s.h / 2;
+    var tx = t.x + off, ty = t.y - t.h / 2;
+    var midY = sy + (ty - sy) / 2 + off;
+    return "M" + sx + "," + sy + " V" + midY + " H" + tx + " V" + ty;
+  }
+
+  // orchestrator → datastore runs sideways at the same height (both
+  // sit in the core's row) rather than top-down like every other link,
+  // so it gets its own straight horizontal path instead of elbow()'s
+  // vertical-horizontal-vertical shape. `off` shifts the whole line up
+  // or down, the equivalent of elbowOffset's y-shift on a horizontal run.
+  function sideLink(s, t, off) {
+    var sx = s.x + s.w / 2, sy = s.y + (off || 0);
+    var tx = t.x - t.w / 2;
+    return "M" + sx + "," + sy + " H" + tx;
+  }
+
+  function linkPath(l) {
+    return l.side ? sideLink(byId[l.s], byId[l.t], 0) : elbow(byId[l.s], byId[l.t]);
+  }
+  function linkPathOffset(l, off) {
+    return l.side ? sideLink(byId[l.s], byId[l.t], off) : elbowOffset(byId[l.s], byId[l.t], off);
   }
 
   var container = document.getElementById("arch-diagram");
@@ -127,8 +167,8 @@
   var gGlow = svg.append("g");
   var gBoundary = svg.append("g");
   var gLinks = svg.append("g");
-  var gNodes = svg.append("g");
   var gPulses = svg.append("g");
+  var gNodes = svg.append("g");
 
   // soft ambient glow that breathes behind the orchestrator — draws the
   // eye to the hub of the system without being a distraction
@@ -146,7 +186,7 @@
   gBoundary.append("rect")
     .attr("class", "arch-boundary")
     .attr("x", 23).attr("y", 209)
-    .attr("width", 1254).attr("height", 465)
+    .attr("width", 1254).attr("height", 379)
     .attr("rx", 14);
   gBoundary.append("text")
     .attr("class", "arch-boundary-label")
@@ -163,7 +203,7 @@
     .enter()
     .append("path")
     .attr("class", function (l) { return "arch-link" + (l.animated ? " trunk" : ""); })
-    .attr("d", function (l) { return elbow(byId[l.s], byId[l.t]); })
+    .attr("d", linkPath)
     .attr("stroke", linkColor)
     .attr("opacity", 0);
 
@@ -174,6 +214,21 @@
     d3.select(this)
       .attr("stroke-dasharray", len + " " + len)
       .attr("stroke-dashoffset", len);
+  });
+
+  // Invisible lane paths pulses travel along: +LANE for the request
+  // (source→target), -LANE for the response (target→source), so the
+  // two directions sit visibly side-by-side instead of overlapping.
+  var LANE = 5;
+  var gGuides = svg.append("g").attr("class", "arch-guides");
+  var guideFwd = [], guideRev = [];
+  links.forEach(function (l) {
+    guideFwd.push(gGuides.append("path")
+      .attr("d", linkPathOffset(l, LANE))
+      .attr("fill", "none").attr("stroke", "none").node());
+    guideRev.push(gGuides.append("path")
+      .attr("d", linkPathOffset(l, -LANE))
+      .attr("fill", "none").attr("stroke", "none").node());
   });
 
   var tooltip = d3.select(container)
@@ -201,7 +256,7 @@
     .attr("transform", function (n) { return "translate(" + (-n.w / 2) + "," + (-n.h / 2) + ")"; });
 
   badge.append("circle")
-    .attr("r", function (n) { return n.type === "core" ? 18 : 15; })
+    .attr("r", function (n) { return n.type === "core" ? 18 : (n.compact ? 12 : 15); })
     .attr("fill", function (n) { return n.accent; });
 
   badge.append("text")
@@ -211,15 +266,19 @@
       // box than the other icons used here, so it needs a nudge to look
       // visually consistent alongside them.
       if (n.id === "mobile") { return 18; }
+      if (n.compact) { return 11; }
       return n.type === "core" ? 17 : 14;
     })
     .text(function (n) { return n.icon; });
 
+  // compact: true marks the narrower side-by-side pairs (the two LLMs,
+  // internal/external APIs) — smaller type so their labels still fit
+  // at roughly half the width of every other node.
   nodeSel.append("text")
     .attr("class", "arch-label")
     .attr("text-anchor", "middle")
     .attr("y", function (n) { return n.sub ? -8 : 6; })
-    .attr("font-size", function (n) { return n.type === "core" ? 20 : 17; })
+    .attr("font-size", function (n) { return n.type === "core" ? 20 : (n.compact ? 13 : 17); })
     .attr("font-weight", function (n) { return n.type === "core" ? 700 : 600; })
     .text(function (n) { return n.label; });
 
@@ -227,8 +286,8 @@
     .append("text")
     .attr("class", "arch-sub")
     .attr("text-anchor", "middle")
-    .attr("y", 17)
-    .attr("font-size", 13.5)
+    .attr("y", function (n) { return n.compact ? 15 : 17; })
+    .attr("font-size", function (n) { return n.compact ? 10.5 : 13.5; })
     .text(function (n) { return n.sub; });
 
   function clearHighlight() {
@@ -278,9 +337,23 @@
       clearHighlight();
     });
 
-  function startPulse(pathNode, color, radius, speed) {
+  // Pixels of travel per millisecond, shared by every pulse on every
+  // link. Duration is derived per-link from its own path length, so a
+  // long link's pulse and a short link's pulse cross their line at the
+  // same visible speed instead of the same fixed time (which made
+  // pulses on short links crawl and pulses on long links dart).
+  var PULSE_VELOCITY = 0.16;
+
+  // Travels along pathNode (one of the offset lane guides above).
+  // reverse: true walks the guide target→source instead of
+  // source→target, since the response lane guide still runs the
+  // same source→target direction geometrically. staggerDelay spaces
+  // multiple pulses out on the same lane so they read as a stream.
+  function startPulse(pathNode, color, radius, reverse, staggerDelay) {
     var length = pathNode.getTotalLength();
-    var duration = speed + Math.random() * speed * 0.4;
+    var baseDuration = length / PULSE_VELOCITY;
+    var duration = baseDuration * (0.9 + Math.random() * 0.2);
+    var maxOpacity = reverse ? 0.6 : 1;
     var dot = gPulses.append("circle")
       .attr("class", "arch-pulse")
       .attr("r", radius)
@@ -289,18 +362,19 @@
 
     function cycle() {
       dot.attr("opacity", 0)
-        .transition().duration(150).attr("opacity", 1)
+        .transition().duration(150).attr("opacity", maxOpacity)
         .transition().duration(duration).ease(d3.easeLinear)
         .attrTween("transform", function () {
           return function (t) {
-            var p = pathNode.getPointAtLength(t * length);
+            var tt = reverse ? 1 - t : t;
+            var p = pathNode.getPointAtLength(tt * length);
             return "translate(" + p.x + "," + p.y + ")";
           };
         })
         .transition().duration(150).attr("opacity", 0)
         .on("end", cycle);
     }
-    setTimeout(cycle, Math.random() * 1800);
+    setTimeout(cycle, (staggerDelay || 0) + Math.random() * 200);
   }
 
   function breatheGlow() {
@@ -339,9 +413,28 @@
     }, order.core * 150 + 500);
 
     setTimeout(function () {
-      linkSel.each(function (l) {
+      links.forEach(function (l, i) {
         var trunk = !!l.animated;
-        startPulse(this, trunk ? "#f2d9a8" : linkColor(l), trunk ? 4.6 : 3, trunk ? 1300 : 2100);
+        var color = trunk ? "#f2d9a8" : linkColor(l);
+        var radius = trunk ? 4.6 : 3;
+        // Every link is a request/response pair, not a one-way call.
+        // Request pulses run full-brightness along the +LANE guide
+        // (source→target); response pulses run dimmer, smaller, along
+        // the separate -LANE guide (target→source) — two lanes side by
+        // side on the line instead of one dot chasing another. Several
+        // pulses per direction, staggered, so each reads as a stream —
+        // stagger spacing scales with this link's own travel time (its
+        // length ÷ PULSE_VELOCITY) so the gaps between pulses look even
+        // whether the link is short or long.
+        var fwdCount = trunk ? 3 : 2;
+        var revCount = trunk ? 2 : 1;
+        var travelTime = guideFwd[i].getTotalLength() / PULSE_VELOCITY;
+        for (var f = 0; f < fwdCount; f++) {
+          startPulse(guideFwd[i], color, radius, false, f * (travelTime / fwdCount));
+        }
+        for (var r = 0; r < revCount; r++) {
+          startPulse(guideRev[i], color, radius * 0.7, true, r * (travelTime / revCount) + 300);
+        }
       });
     }, 1100);
 
