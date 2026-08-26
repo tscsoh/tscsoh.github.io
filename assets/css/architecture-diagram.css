@@ -1,0 +1,74 @@
+/* ============================================================
+   "How I Architect AI Systems" — D3 architecture diagram
+   Enterprise orchestration over local, self-hosted LLMs.
+   Paired with assets/js/architecture-diagram.js.
+============================================================ */
+
+#architecture { background: #ffffff; padding: 1.875em 0; }
+
+#arch-diagram {
+  position: relative;
+  width: 100%;
+  max-width: 1160px;
+  margin: 20px auto 0;
+}
+#arch-diagram svg { width: 100%; height: auto; display: block; }
+
+#arch-diagram .arch-node rect {
+  fill: #ffffff;
+  stroke-width: 1.5px;
+  transition: stroke-width 0.25s, filter 0.25s;
+}
+#arch-diagram .arch-node.client rect, #arch-diagram .arch-node.gateway rect { stroke-opacity: 0.55; }
+#arch-diagram .arch-node.core rect { stroke-width: 2px; }
+#arch-diagram .arch-node.lit rect { filter: url(#glow-soft); }
+#arch-diagram .arch-node text { fill: #232323; font-family: 'Helvetica Neue', Arial, sans-serif; pointer-events: none; }
+#arch-diagram .arch-node .arch-sub { fill: #999999; }
+#arch-diagram .arch-node.dim { opacity: 0.28; }
+#arch-diagram .arch-node { cursor: pointer; }
+#arch-diagram .arch-node > g { transition: transform 0.25s ease-out; }
+
+#arch-diagram .arch-badge circle { transition: opacity 0.25s; }
+#arch-diagram .arch-badge text { fill: #ffffff; font-family: 'FontAwesome'; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+
+#arch-diagram .arch-link { fill: none; stroke-width: 1.5px; stroke-opacity: 0.7; transition: stroke-width 0.25s, opacity 0.25s, stroke-opacity 0.25s; }
+#arch-diagram .arch-link.trunk { stroke-width: 2px; }
+#arch-diagram .arch-link.active { stroke-opacity: 1; stroke-width: 2.5px; filter: url(#glow-soft); }
+#arch-diagram .arch-link.dim { opacity: 0.15; }
+
+#arch-diagram .arch-boundary {
+  fill: none;
+  stroke: #c5a47e;
+  stroke-width: 1.5px;
+  stroke-dasharray: 6 5;
+  opacity: 0.6;
+  animation: arch-march 22s linear infinite;
+}
+@keyframes arch-march { to { stroke-dashoffset: -440; } }
+#arch-diagram .arch-boundary-label { fill: #c5a47e; font-family: monospace; font-size: 14px; letter-spacing: 0.08em; }
+
+#arch-diagram .arch-pulse { filter: url(#glow-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  #arch-diagram .arch-boundary { animation: none; }
+  #arch-diagram .arch-pulse { display: none; }
+}
+
+.arch-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #1c1c1c;
+  color: #fff;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px 13px;
+  border-radius: 6px;
+  max-width: 240px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 20;
+}
+.arch-tooltip.show { opacity: 1; }
+.arch-tooltip b { color: #d9b98a; }
