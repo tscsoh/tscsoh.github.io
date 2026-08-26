@@ -65,11 +65,19 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    background-color. Tying height to the parent (100%) and matching
    that fallback color to the hero makes the seam impossible at any
    width, and invisible even if a sub-pixel gap ever does occur. */
+/* The image should hold still while the page scrolls past it, not
+   scroll along with it — background-attachment: fixed does that
+   natively (GPU-composited on current mobile browsers), unlike the
+   desktop version's per-scroll-frame JS transform (script.js
+   checkScrollForParallax, gated to width > 992px so it never runs
+   here), which is exactly the kind of main-thread work that reads as
+   "jerky" on a phone. */
 #home.parallax .responsive-background {
   height: 100%;
   background-color: #04060a;
   background-position: 50% 15%;
   background-size: 220% auto;
+  background-attachment: fixed;
   filter: brightness(0.3) contrast(1.15) saturate(0.7);
 }
 
