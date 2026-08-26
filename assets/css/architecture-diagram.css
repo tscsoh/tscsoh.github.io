@@ -25,7 +25,7 @@
 #arch-diagram .arch-node text { fill: #232323; font-family: 'Helvetica Neue', Arial, sans-serif; pointer-events: none; }
 #arch-diagram .arch-node .arch-sub { fill: #999999; }
 #arch-diagram .arch-node.dim { opacity: 0.28; }
-#arch-diagram .arch-node { cursor: pointer; }
+#arch-diagram .arch-node { cursor: pointer; transition: opacity 0.25s ease; }
 #arch-diagram .arch-node > g { transition: transform 0.25s ease-out; }
 
 #arch-diagram .arch-badge circle { transition: opacity 0.25s; }

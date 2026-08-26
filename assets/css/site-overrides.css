@@ -1,0 +1,175 @@
+/* ============================================================
+   Site-specific overrides on top of the Rubik template
+   (assets/css/bootstrap.css + assets/css/styles.css).
+   Paired with index.html. Grouped by the section each rule
+   targets, not by when it was added.
+============================================================ */
+
+/* ---- misc / a11y ------------------------------------------ */
+a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.repo-link {
+  color: #c9a52a;
+  font-family: monospace;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
+}
+.repo-link:hover {
+  color: #c9a52a;
+  text-shadow: 0 0 8px rgba(201, 165, 42, 0.7), 0 0 20px rgba(201, 165, 42, 0.4);
+  border-bottom: 1px solid #c9a52a;
+  text-decoration: none;
+}
+
+/* ---- hero portrait ------------------------------------------
+   Crop/darken the hero photo to match the previous photo's
+   moody, tightly-cropped treatment. */
+#home.parallax > img {
+  object-fit: cover;
+  object-position: 50% 22%;
+  transform: scale(1.6);
+  transform-origin: 50% 22%;
+  filter: brightness(0.3) contrast(1.15) saturate(0.7);
+}
+/* Below ~992px width, script.js swaps the <img> above for a plain
+   background-image div (see checkResponsiveImage in script.js) —
+   it needs the same crop/darken treatment applied here separately. */
+#home.parallax .responsive-background {
+  background-position: 50% 15%;
+  background-size: 220% auto;
+  filter: brightness(0.3) contrast(1.15) saturate(0.7);
+}
+
+/* ---- hero title + contact info (luxury pass) -----------------
+   The template's default hard 3D drop-shadow on the hero title
+   reads as dated; a single soft lift keeps it legible over the
+   photo without the "stamped" look. */
+#home .section-header h1,
+.section-header h1 {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* De-emphasize the hero contact info from two giant stacked lines
+   into one quiet, tracked-out strip — the phone number doesn't
+   need to shout as loud as the title. */
+#home .content h5 {
+  display: block;
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: none;
+  margin: 0 0 10px;
+}
+#home .content h5:last-of-type {
+  margin-bottom: 0;
+}
+
+/* ---- hero load-in sequence -------------------------------------
+   Paired with assets/js/hero-intro.js, which splits the title into
+   one <span class="hero-char"> per character and staggers each
+   one's animation-delay. Title characters settle in first (blur +
+   rise + fade), then the separator, then the contact info — a short
+   choreographed "power-on" rather than everything appearing at once.
+   Skipped under prefers-reduced-motion (the JS bails out entirely,
+   so these rules simply never find anything to apply to). */
+#home .hero-title-intro .hero-word {
+  display: inline-block;
+}
+#home .hero-title-intro .hero-char {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(26px);
+  animation: hero-char-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+#home .hero-title-intro .hero-char.space {
+  width: 0.32em;
+}
+@keyframes hero-char-in {
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+#home .separator-container {
+  opacity: 0;
+  transform: scale(0.9);
+  animation: hero-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 1s;
+}
+#home .content h5,
+#home .content > a.btn-social {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: hero-rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 1.3s;
+}
+#home .content h5:nth-of-type(2) { animation-delay: 1.4s; }
+#home .content > a.btn-social { animation-delay: 1.5s; }
+@keyframes hero-scale-in { to { opacity: 1; transform: scale(1); } }
+@keyframes hero-rise-in { to { opacity: 1; transform: translateY(0); } }
+
+/* ---- project grid (luxury pass) -------------------------------
+   Give the grid a slim, considered gutter instead of the
+   template's edge-to-edge mosaic, and reveal each title on hover
+   through a soft gradient scrim instead of no caption at all.
+   This row has no .container wrapper to supply the padding that
+   normally offsets Bootstrap's -15px row margin, so below the
+   template's own 992px override that row overflowed its section
+   by 30px on every phone/tablet width — zero it out unconditionally. */
+.section-we-made-1.section-with-hover .row {
+  margin: 0;
+}
+.section-we-made-1.section-with-hover .row [class^="col-"] {
+  padding: 3px !important;
+}
+.section-with-hover .project-caption {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  padding: 28px 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 55%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.section-with-hover .project:hover .project-caption { opacity: 1; }
+.section-with-hover .project-caption span {
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  transform: translateY(6px);
+  transition: transform 0.35s ease;
+}
+.section-with-hover .project:hover .project-caption span { transform: translateY(0); }
+.section-with-hover .project img { transition: transform 0.6s ease, filter 0.6s ease; }
+.section-with-hover .project:hover img { transform: scale(1.035); }
+
+/* ---- small screens ------------------------------------------ */
+@media (max-width: 768px) {
+  .repo-link {
+    padding: 0 24px;
+    display: inline-block;
+  }
+  .intro-video-wrap {
+    overflow: hidden;
+    height: 56vw;
+  }
+  .intro-video-wrap video {
+    width: 160% !important;
+    margin-left: -30%;
+    margin-top: -8%;
+  }
+}

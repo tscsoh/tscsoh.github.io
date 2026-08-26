@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  var W = 1270, H = 665;
+  var W = 1300, H = 700;
 
   // ---- palette sampled from the UX-process diagram directly below this
   // section (Discover/Define/Prototype/Design/Deliver), so the two feel
@@ -144,8 +144,8 @@
 
   gBoundary.append("rect")
     .attr("class", "arch-boundary")
-    .attr("x", 20).attr("y", 205)
-    .attr("width", W - 40).attr("height", 457)
+    .attr("x", 23).attr("y", 209)
+    .attr("width", 1254).attr("height", 465)
     .attr("rx", 14);
   gBoundary.append("text")
     .attr("class", "arch-boundary-label")

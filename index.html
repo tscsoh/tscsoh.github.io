@@ -16,57 +16,7 @@
   <link href="assets/css/fonts/pe-icon-7-stroke.css" rel="stylesheet">
   <link href="assets/css/fonts/fonts.css" rel="stylesheet" />
   <link href="assets/css/architecture-diagram.css" rel="stylesheet" />
-  <style>
-    a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
-      outline: none !important;
-      box-shadow: none !important;
-    }
-    .repo-link {
-      color: #c9a52a;
-      font-family: monospace;
-      font-size: 14px;
-      letter-spacing: 0.05em;
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
-    }
-    .repo-link:hover {
-      color: #c9a52a;
-      text-shadow: 0 0 8px rgba(201, 165, 42, 0.7), 0 0 20px rgba(201, 165, 42, 0.4);
-      border-bottom: 1px solid #c9a52a;
-      text-decoration: none;
-    }
-    #home.parallax > img {
-      object-fit: cover;
-      object-position: 50% 22%;
-      transform: scale(1.6);
-      transform-origin: 50% 22%;
-      filter: brightness(0.3) contrast(1.15) saturate(0.7);
-    }
-    /* Below ~992px width, script.js swaps the <img> above for a plain
-       background-image div (see checkResponsiveImage in script.js) —
-       it needs the same crop/darken treatment applied here separately. */
-    #home.parallax .responsive-background {
-      background-position: 50% 15%;
-      background-size: 220% auto;
-      filter: brightness(0.3) contrast(1.15) saturate(0.7);
-    }
-  @media (max-width: 768px) {
-    .repo-link {
-      padding: 0 24px;
-      display: inline-block;
-    }
-    .intro-video-wrap {
-      overflow: hidden;
-      height: 56vw;
-    }
-    .intro-video-wrap video {
-      width: 160% !important;
-      margin-left: -30%;
-      margin-top: -8%;
-    }
-  }
-  </style>
+  <link href="assets/css/site-overrides.css" rel="stylesheet" />
 </head>
 
 <body id="skrollr-body">
@@ -203,12 +153,12 @@
       <div class="row">
         <div class="col-md-6">
           <div class="project add-animation animation-1">
-            <img src="assets/img/KIASimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" />
+            <img src="assets/img/KIASimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="project add-animation animation-2">
-            <img src="assets/img/HomeSimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" />
+            <img src="assets/img/HomeSimpleConnect.png" style="width: 100%; object-fit: cover; height: 40vh;" loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -225,7 +175,7 @@
             <iframe width="100%" height="500" src="https://www.youtube.com/embed/D_mZ_DLe4Ag?si=fnW0jZbHIuLixLGG"
               title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
           </div>
         </div>
         <div class="col-md-6">
@@ -233,7 +183,7 @@
             <iframe width="100%" height="500" src="https://www.youtube.com/embed/BbiBbVCDanE?si=s2_WmPDcFjDUgHqq"
               title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -243,7 +193,7 @@
             <iframe width="100%" height="500" src="https://www.youtube.com/embed/zDxpHccTuMw?si=mR-h0b8KhfJQFYA4"
               title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
           </div>
         </div>
         <div class="col-md-6">
@@ -251,14 +201,14 @@
             <iframe width="100%" height="500" src="https://www.youtube.com/embed/fHZdDd8Kcn8?si=cPfj3qE2O6uWXROE"
               title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <div class="project add-animation animation-3">
-            <video width="100%" height="500" controls controlsList="nodownload">
+            <video width="100%" height="500" controls controlsList="nodownload" preload="metadata">
               <source src="assets/video/InjectionPen.mp4" type="video/mp4">
               Your browser does not support the video tag.
             </video>
@@ -266,7 +216,7 @@
         </div>
         <div class="col-md-6">
           <div class="project add-animation animation-4">
-            <video width="100%" height="500" controls controlsList="nodownload">
+            <video width="100%" height="500" controls controlsList="nodownload" preload="metadata">
               <source src="assets/video/HandVideo.mp4" type="video/mp4">
               Your browser does not support the video tag.
             </video>
@@ -297,6 +247,12 @@
 
 <!--   file where we handle all the script from the Rubik page   -->
 <script type="text/javascript" src="assets/js/script.js"></script>
+
+<!--   project thumbnail grid: data + render   -->
+<script type="text/javascript" src="assets/js/projects-grid.js"></script>
+
+<!--   hero title load-in sequence   -->
+<script type="text/javascript" src="assets/js/hero-intro.js"></script>
 
 <!--   D3 architecture diagram: enterprise orchestration over local LLMs   -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
