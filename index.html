@@ -52,31 +52,36 @@
     }
 
     /* Architecture diagram section */
-    #architecture { background: #ffffff; padding-bottom: 10px; }
+    #architecture { background: #ffffff; padding: 1.875em 0; }
     #arch-diagram {
       width: 100%;
-      max-width: 1140px;
-      margin: 30px auto 10px;
+      max-width: 1160px;
+      margin: 20px auto 0;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
     #arch-diagram svg { width: 100%; height: auto; display: block; }
     #arch-diagram .arch-node rect {
       fill: #ffffff;
-      stroke: #d7d7d7;
       stroke-width: 1.5px;
-      transition: stroke 0.25s, stroke-width 0.25s, filter 0.25s;
+      transition: stroke-width 0.25s, filter 0.25s;
     }
-    #arch-diagram .arch-node.core rect { stroke: #c5a47e; stroke-width: 2px; }
+    #arch-diagram .arch-node.client rect, #arch-diagram .arch-node.gateway rect { stroke-opacity: 0.55; }
+    #arch-diagram .arch-node.core rect { stroke-width: 2px; }
     #arch-diagram .arch-node text { fill: #232323; font-family: 'Helvetica Neue', Arial, sans-serif; pointer-events: none; }
     #arch-diagram .arch-node .arch-sub { fill: #999999; }
     #arch-diagram .arch-node.dim { opacity: 0.28; }
-    #arch-diagram .arch-link { fill: none; stroke: #cfcfcf; stroke-width: 1.5px; transition: stroke 0.25s, stroke-width 0.25s, opacity 0.25s; }
+    #arch-diagram .arch-badge circle { transition: opacity 0.25s; }
+    #arch-diagram .arch-badge text { font-family: 'FontAwesome'; text-anchor: middle; dominant-baseline: central; }
+    #arch-diagram .arch-link { fill: none; stroke-width: 1.5px; stroke-opacity: 0.7; transition: stroke-width 0.25s, opacity 0.25s, stroke-opacity 0.25s; }
+    #arch-diagram .arch-link.active { stroke-opacity: 1; }
     #arch-diagram .arch-link.dim { opacity: 0.15; }
-    #arch-diagram .arch-link.active { stroke: #c5a47e; stroke-width: 2.5px; }
+    #arch-diagram .arch-link.active { stroke-width: 2.5px; }
     #arch-diagram .arch-boundary { fill: none; stroke: #c5a47e; stroke-width: 1.5px; stroke-dasharray: 6 5; opacity: 0.55; }
     #arch-diagram .arch-boundary-label { fill: #c5a47e; font-family: monospace; font-size: 12px; letter-spacing: 0.08em; }
     #arch-diagram .arch-pulse { fill: #c5a47e; }
     #arch-diagram .arch-node { cursor: pointer; }
+    .arch-scroll-hint { display: none; text-align: center; font-family: monospace; font-size: 11px; letter-spacing: 0.12em; color: #b3a68f; margin-top: 8px; }
     .arch-tooltip {
       position: absolute;
       pointer-events: none;
@@ -109,6 +114,11 @@
       margin-left: -30%;
       margin-top: -8%;
     }
+    /* Below tablet width the diagram is too dense to shrink-to-fit and stay
+       legible, so it holds a fixed pixel width and scrolls horizontally
+       instead of squeezing all 17 nodes down to illegible text. */
+    #arch-diagram svg { width: 1180px; min-width: 1180px; }
+    .arch-scroll-hint { display: block; }
   }
   </style>
 </head>
@@ -240,6 +250,7 @@
           </div>
         </div>
         <div id="arch-diagram" aria-label="Diagram of an enterprise AI orchestration architecture using local, self-hosted LLMs"></div>
+        <p class="arch-scroll-hint">← scroll to explore the full diagram →</p>
       </div>
     </div>
 
@@ -356,48 +367,62 @@
 (function () {
   "use strict";
 
-  var W = 1200, H = 600;
+  var W = 1270, H = 586;
+
+  // ---- palette sampled from the UX-process diagram directly below this
+  // section (Discover/Define/Prototype/Design/Deliver), so the two feel
+  // like one system rather than two unrelated graphics -----------------
+  var PALETTE = {
+    router: "#00b3b3",   // Discover  (teal)
+    rag:    "#1f86ad",   // Define    (blue)
+    tools:  "#d81f74",   // Prototype (pink)
+    guard:  "#54269e",   // Design    (purple)
+    obs:    "#c99b1f",   // Deliver   (gold, darkened slightly for text contrast)
+    core:   "#c5a47e",   // site's own brand gold — ties to the rest of the page
+    neutral:"#8a8a8a"
+  };
 
   // ---- node data (fixed layout — this is a real, working reference
-  // architecture, not a random graph) -------------------------------
+  // architecture, not a random graph). Every node keeps at least 20
+  // logical units of clearance from the SVG/boundary edges. -----------
   var nodes = [
-    { id: "web",      label: "Web App",         x: 355, y: 50,  w: 130, h: 44, type: "client",
+    { id: "web",      label: "Web App",         icon: "", x: 405, y: 50,  w: 130, h: 44, type: "client", accent: PALETTE.neutral,
       desc: "Browser-based client. Talks to the orchestration layer only through the API Gateway." },
-    { id: "mobile",    label: "Mobile App",      x: 600, y: 50,  w: 130, h: 44, type: "client",
+    { id: "mobile",    label: "Mobile App",      icon: "", x: 650, y: 50,  w: 130, h: 44, type: "client", accent: PALETTE.neutral,
       desc: "Native iOS/Android client, same gateway contract as the web app." },
-    { id: "internal",  label: "Internal Tools",  x: 845, y: 50,  w: 130, h: 44, type: "client",
+    { id: "internal",  label: "Internal Tools",  icon: "", x: 895, y: 50,  w: 130, h: 44, type: "client", accent: PALETTE.neutral,
       desc: "Internal dashboards and scripts used by staff — still authenticated through the gateway." },
 
-    { id: "gateway",   label: "API Gateway",     sub: "AuthN/Z · Rate Limit · TLS", x: 600, y: 150, w: 190, h: 52, type: "gateway",
+    { id: "gateway",   label: "API Gateway",     icon: "", sub: "AuthN/Z · Rate Limit · TLS", x: 650, y: 150, w: 190, h: 52, type: "gateway", accent: PALETTE.neutral,
       desc: "Single public entry point. Terminates TLS, authenticates callers, enforces rate limits before anything reaches the orchestrator." },
 
-    { id: "orchestrator", label: "Orchestration Engine", sub: "Agent Graph · Task Router · Session Ctx", x: 600, y: 264, w: 250, h: 68, type: "core",
+    { id: "orchestrator", label: "Orchestration Engine", icon: "", sub: "Agent Graph · Task Router · Session Ctx", x: 650, y: 264, w: 250, h: 68, type: "core", accent: PALETTE.core,
       desc: "The brain of the system: routes each request through a task graph, decides which model, tools and data sources a request needs, and assembles the final response." },
 
-    { id: "model-router", label: "Model Router", sub: "Routes by task, cost & latency", x: 110, y: 384, w: 175, h: 54, type: "service",
+    { id: "model-router", label: "Model Router", icon: "", sub: "Routes by task, cost & latency", x: 160, y: 384, w: 175, h: 54, type: "service", accent: PALETTE.router,
       desc: "Chooses which local model serves a given request — a small fast model for simple turns, a larger model for complex reasoning." },
-    { id: "rag",        label: "RAG Retrieval",  sub: "Query rewrite · re-rank",        x: 355, y: 384, w: 175, h: 54, type: "service",
+    { id: "rag",        label: "RAG Retrieval",  icon: "", sub: "Query rewrite · re-rank",        x: 405, y: 384, w: 175, h: 54, type: "service", accent: PALETTE.rag,
       desc: "Rewrites the user query, retrieves relevant chunks from the vector store, and re-ranks them before they're added to the model's context." },
-    { id: "tools",       label: "Tool Sandbox",   sub: "Function calling · isolation",   x: 600, y: 384, w: 175, h: 54, type: "service",
+    { id: "tools",       label: "Tool Sandbox",   icon: "", sub: "Function calling · isolation",   x: 650, y: 384, w: 175, h: 54, type: "service", accent: PALETTE.tools,
       desc: "Executes model-requested function calls in an isolated runtime with a strict allow-list of internal and external endpoints." },
-    { id: "guardrails",  label: "Guardrails",     sub: "PII redaction · policy filter",  x: 845, y: 384, w: 175, h: 54, type: "service",
+    { id: "guardrails",  label: "Guardrails",     icon: "", sub: "PII redaction · policy filter",  x: 895, y: 384, w: 175, h: 54, type: "service", accent: PALETTE.guard,
       desc: "Pre- and post-processing filter: redacts sensitive data on the way in, checks policy compliance on the way out." },
-    { id: "observability", label: "Observability", sub: "Logs · Traces · Metrics",        x: 1090, y: 384, w: 175, h: 54, type: "service",
+    { id: "observability", label: "Observability", icon: "", sub: "Logs · Traces · Metrics",        x: 1140, y: 384, w: 175, h: 54, type: "service", accent: PALETTE.obs,
       desc: "Structured logging, distributed tracing and metrics for every step of a request — required for debugging and audit." },
 
-    { id: "llm-a",       label: "Llama-3 70B",   sub: "GPU A · vLLM",    x: 40,  y: 500, w: 135, h: 52, type: "llm",
+    { id: "llm-a",       label: "Llama-3 70B",   icon: "", sub: "GPU A · vLLM",    x: 100, y: 500, w: 115, h: 52, type: "llm", accent: PALETTE.router,
       desc: "Larger self-hosted model for complex reasoning, served on-prem via vLLM — no request or token ever leaves the network." },
-    { id: "llm-b",       label: "Llama-3 8B",    sub: "GPU B · fast path", x: 190, y: 500, w: 135, h: 52, type: "llm",
+    { id: "llm-b",       label: "Llama-3 8B",    icon: "", sub: "GPU B · fast path", x: 222, y: 500, w: 115, h: 52, type: "llm", accent: PALETTE.router,
       desc: "Smaller, faster self-hosted model for simple/low-latency turns, served via Ollama on a second GPU node." },
-    { id: "vector-db",   label: "Vector DB",     sub: "pgvector · embeddings", x: 355, y: 500, w: 150, h: 52, type: "data",
+    { id: "vector-db",   label: "Vector DB",     icon: "", sub: "pgvector · embeddings", x: 405, y: 500, w: 150, h: 52, type: "data", accent: PALETTE.rag,
       desc: "Stores document embeddings for retrieval-augmented generation, running as a Postgres extension inside the private network." },
-    { id: "internal-api", label: "Internal APIs", sub: "CRM · ERP · Warehouse", x: 520, y: 500, w: 150, h: 52, type: "data",
+    { id: "internal-api", label: "Internal APIs", icon: "", sub: "CRM · ERP · Warehouse", x: 570, y: 500, w: 150, h: 52, type: "data", accent: PALETTE.tools,
       desc: "Read/write access to internal systems of record, called only through the tool sandbox." },
-    { id: "external-api", label: "External APIs", sub: "Allow-listed · egress proxy", x: 680, y: 500, w: 150, h: 52, type: "data",
+    { id: "external-api", label: "External APIs", icon: "", sub: "Allow-listed · egress proxy", x: 730, y: 500, w: 150, h: 52, type: "data", accent: PALETTE.tools,
       desc: "A narrow, explicitly allow-listed set of third-party APIs, reached through an egress proxy for auditability." },
-    { id: "audit",       label: "Audit Log",     sub: "SIEM · immutable trail", x: 845, y: 500, w: 150, h: 52, type: "data",
+    { id: "audit",       label: "Audit Log",     icon: "", sub: "SIEM · immutable trail", x: 895, y: 500, w: 150, h: 52, type: "data", accent: PALETTE.guard,
       desc: "Immutable, append-only record of every guardrail decision — feeds the SIEM for compliance review." },
-    { id: "datastore",   label: "Redis + Postgres", sub: "Session & conversation state", x: 1090, y: 500, w: 175, h: 52, type: "data",
+    { id: "datastore",   label: "Redis + Postgres", icon: "", sub: "Session & conversation state", x: 1140, y: 500, w: 175, h: 52, type: "data", accent: PALETTE.obs,
       desc: "Redis for short-lived session state, Postgres for durable conversation history — both private, both inside the boundary." }
   ];
 
@@ -453,12 +478,17 @@
   gBoundary.append("rect")
     .attr("class", "arch-boundary")
     .attr("x", 20).attr("y", 222)
-    .attr("width", W - 40).attr("height", 344)
+    .attr("width", W - 40).attr("height", 326)
     .attr("rx", 14);
   gBoundary.append("text")
     .attr("class", "arch-boundary-label")
     .attr("x", 38).attr("y", 244)
     .text("PRIVATE NETWORK — LOCAL LLM INFERENCE, NO DATA LEAVES PREMISES");
+
+  function linkColor(l) {
+    var t = byId[l.t];
+    return (t.type === "service" || t.type === "llm" || t.type === "data") ? t.accent : "#cfcfcf";
+  }
 
   var linkSel = gLinks.selectAll("path.arch-link")
     .data(links)
@@ -466,6 +496,7 @@
     .append("path")
     .attr("class", "arch-link")
     .attr("d", function (l) { return elbow(byId[l.s], byId[l.t]); })
+    .attr("stroke", linkColor)
     .attr("opacity", 0);
 
   var tooltip = d3.select(container)
@@ -485,7 +516,21 @@
     .attr("y", function (n) { return -n.h / 2; })
     .attr("width", function (n) { return n.w; })
     .attr("height", function (n) { return n.h; })
-    .attr("rx", 9);
+    .attr("rx", 9)
+    .attr("stroke", function (n) { return n.accent; });
+
+  var badge = nodeSel.append("g")
+    .attr("class", "arch-badge")
+    .attr("transform", function (n) { return "translate(" + (-n.w / 2) + "," + (-n.h / 2) + ")"; });
+
+  badge.append("circle")
+    .attr("r", function (n) { return n.type === "core" ? 15 : 12; })
+    .attr("fill", function (n) { return n.accent; });
+
+  badge.append("text")
+    .attr("fill", "#ffffff")
+    .attr("font-size", function (n) { return n.type === "core" ? 14 : 11; })
+    .text(function (n) { return n.icon; });
 
   nodeSel.append("text")
     .attr("class", "arch-label")
