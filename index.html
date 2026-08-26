@@ -54,6 +54,7 @@
     /* Architecture diagram section */
     #architecture { background: #ffffff; padding: 1.875em 0; }
     #arch-diagram {
+      position: relative;
       width: 100%;
       max-width: 1160px;
       margin: 20px auto 0;
@@ -68,19 +69,33 @@
     }
     #arch-diagram .arch-node.client rect, #arch-diagram .arch-node.gateway rect { stroke-opacity: 0.55; }
     #arch-diagram .arch-node.core rect { stroke-width: 2px; }
+    #arch-diagram .arch-node.lit rect { filter: url(#glow-soft); }
     #arch-diagram .arch-node text { fill: #232323; font-family: 'Helvetica Neue', Arial, sans-serif; pointer-events: none; }
     #arch-diagram .arch-node .arch-sub { fill: #999999; }
     #arch-diagram .arch-node.dim { opacity: 0.28; }
     #arch-diagram .arch-badge circle { transition: opacity 0.25s; }
-    #arch-diagram .arch-badge text { font-family: 'FontAwesome'; text-anchor: middle; dominant-baseline: central; }
+    #arch-diagram .arch-badge text { fill: #ffffff; font-family: 'FontAwesome'; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
     #arch-diagram .arch-link { fill: none; stroke-width: 1.5px; stroke-opacity: 0.7; transition: stroke-width 0.25s, opacity 0.25s, stroke-opacity 0.25s; }
-    #arch-diagram .arch-link.active { stroke-opacity: 1; }
+    #arch-diagram .arch-link.trunk { stroke-width: 2px; }
+    #arch-diagram .arch-link.active { stroke-opacity: 1; stroke-width: 2.5px; filter: url(#glow-soft); }
     #arch-diagram .arch-link.dim { opacity: 0.15; }
-    #arch-diagram .arch-link.active { stroke-width: 2.5px; }
-    #arch-diagram .arch-boundary { fill: none; stroke: #c5a47e; stroke-width: 1.5px; stroke-dasharray: 6 5; opacity: 0.55; }
+    #arch-diagram .arch-boundary {
+      fill: none;
+      stroke: #c5a47e;
+      stroke-width: 1.5px;
+      stroke-dasharray: 6 5;
+      opacity: 0.6;
+      animation: arch-march 22s linear infinite;
+    }
+    @keyframes arch-march { to { stroke-dashoffset: -440; } }
     #arch-diagram .arch-boundary-label { fill: #c5a47e; font-family: monospace; font-size: 12px; letter-spacing: 0.08em; }
-    #arch-diagram .arch-pulse { fill: #c5a47e; }
+    #arch-diagram .arch-pulse { filter: url(#glow-soft); }
     #arch-diagram .arch-node { cursor: pointer; }
+    #arch-diagram .arch-node > g { transition: transform 0.25s ease-out; }
+    @media (prefers-reduced-motion: reduce) {
+      #arch-diagram .arch-boundary { animation: none; }
+      #arch-diagram .arch-pulse { display: none; }
+    }
     .arch-scroll-hint { display: none; text-align: center; font-family: monospace; font-size: 11px; letter-spacing: 0.12em; color: #b3a68f; margin-top: 8px; }
     .arch-tooltip {
       position: absolute;
@@ -470,15 +485,42 @@
     .attr("preserveAspectRatio", "xMidYMid meet")
     .attr("role", "img");
 
+  // ---- soft glow filters, reused across nodes/links for a high-tech
+  // but restrained look (no filter is on by default — applied via class) --
+  var defs = svg.append("defs");
+  [["glow-soft", 2.2], ["glow-strong", 4.5]].forEach(function (spec) {
+    var f = defs.append("filter")
+      .attr("id", spec[0])
+      .attr("x", "-80%").attr("y", "-80%").attr("width", "260%").attr("height", "260%");
+    f.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", spec[1]).attr("result", "blur");
+    var merge = f.append("feMerge");
+    merge.append("feMergeNode").attr("in", "blur");
+    merge.append("feMergeNode").attr("in", "SourceGraphic");
+  });
+
+  var gGlow = svg.append("g");
   var gBoundary = svg.append("g");
   var gLinks = svg.append("g");
   var gNodes = svg.append("g");
   var gPulses = svg.append("g");
 
+  // soft ambient glow that breathes behind the orchestrator — draws the
+  // eye to the hub of the system without being a distraction
+  var core = byId.orchestrator;
+  var coreGlow = gGlow.append("rect")
+    .attr("x", core.x - core.w / 2 - 6).attr("y", core.y - core.h / 2 - 6)
+    .attr("width", core.w + 12).attr("height", core.h + 12)
+    .attr("rx", 13)
+    .attr("fill", "none")
+    .attr("stroke", PALETTE.core)
+    .attr("stroke-width", 2)
+    .attr("filter", "url(#glow-strong)")
+    .attr("opacity", 0);
+
   gBoundary.append("rect")
     .attr("class", "arch-boundary")
-    .attr("x", 20).attr("y", 222)
-    .attr("width", W - 40).attr("height", 326)
+    .attr("x", 20).attr("y", 205)
+    .attr("width", W - 40).attr("height", 343)
     .attr("rx", 14);
   gBoundary.append("text")
     .attr("class", "arch-boundary-label")
@@ -494,10 +536,19 @@
     .data(links)
     .enter()
     .append("path")
-    .attr("class", "arch-link")
+    .attr("class", function (l) { return "arch-link" + (l.animated ? " trunk" : ""); })
     .attr("d", function (l) { return elbow(byId[l.s], byId[l.t]); })
     .attr("stroke", linkColor)
     .attr("opacity", 0);
+
+  // line-draw reveal: each path starts fully hidden behind its own length
+  // in dashes, then "draws itself" open — reads as a schematic powering on
+  linkSel.each(function () {
+    var len = this.getTotalLength();
+    d3.select(this)
+      .attr("stroke-dasharray", len + " " + len)
+      .attr("stroke-dashoffset", len);
+  });
 
   var tooltip = d3.select(container)
     .append("div")
@@ -557,7 +608,8 @@
   nodeSel
     .on("mouseenter", function (event, n) {
       var adj = adjacency[n.id];
-      nodeSel.classed("dim", function (o) { return !adj.nodes[o.id]; });
+      nodeSel.classed("dim", function (o) { return !adj.nodes[o.id]; })
+        .classed("lit", function (o) { return adj.nodes[o.id]; });
       linkSel
         .classed("dim", function (l, i) { return adj.links.indexOf(i) === -1; })
         .classed("active", function (l, i) { return adj.links.indexOf(i) !== -1; });
@@ -574,12 +626,19 @@
         .style("left", (event.clientX - rect.left + 16) + "px")
         .style("top", (event.clientY - rect.top + 12) + "px");
     })
-    .on("mouseleave", clearHighlight);
+    .on("mouseleave", function () {
+      nodeSel.classed("lit", false);
+      clearHighlight();
+    });
 
-  function startPulse(pathNode) {
+  function startPulse(pathNode, color, radius, speed) {
     var length = pathNode.getTotalLength();
-    var duration = 1500 + Math.random() * 700;
-    var dot = gPulses.append("circle").attr("class", "arch-pulse").attr("r", 3.4).attr("opacity", 0);
+    var duration = speed + Math.random() * speed * 0.4;
+    var dot = gPulses.append("circle")
+      .attr("class", "arch-pulse")
+      .attr("r", radius)
+      .attr("fill", color)
+      .attr("opacity", 0);
 
     function cycle() {
       dot.attr("opacity", 0)
@@ -594,7 +653,14 @@
         .transition().duration(150).attr("opacity", 0)
         .on("end", cycle);
     }
-    setTimeout(cycle, Math.random() * 1600);
+    setTimeout(cycle, Math.random() * 1800);
+  }
+
+  function breatheGlow() {
+    coreGlow
+      .transition().duration(1900).ease(d3.easeSinInOut).attr("opacity", 0.85)
+      .transition().duration(1900).ease(d3.easeSinInOut).attr("opacity", 0.25)
+      .on("end", breatheGlow);
   }
 
   var played = false;
@@ -602,29 +668,35 @@
     if (played) { return; }
     played = true;
 
+    var order = { client: 0, gateway: 1, core: 2, service: 3, llm: 4, data: 4 };
+
     nodeSel.transition()
-      .delay(function (n) {
-        var order = { client: 0, gateway: 1, core: 2, service: 3, llm: 4, data: 4 };
-        return order[n.type] * 130;
-      })
-      .duration(480)
+      .delay(function (n) { return order[n.type] * 150; })
+      .duration(520)
       .ease(d3.easeCubicOut)
       .attr("opacity", 1)
       .attr("transform", function (n) { return "translate(" + n.x + "," + n.y + ") scale(1)"; });
 
-    linkSel.transition()
-      .delay(function (l) {
-        var order = { client: 0, gateway: 1, core: 2, service: 3, llm: 4, data: 4 };
-        return (order[byId[l.t].type] || 0) * 130 + 120;
-      })
-      .duration(420)
-      .attr("opacity", 1);
+    linkSel.each(function (l) {
+      var len = this.getTotalLength();
+      d3.select(this).transition()
+        .delay(order[byId[l.t].type] * 150 + 140)
+        .duration(560)
+        .ease(d3.easeCubicInOut)
+        .attr("opacity", 1)
+        .attr("stroke-dashoffset", 0);
+    });
+
+    setTimeout(function () {
+      coreGlow.transition().duration(700).attr("opacity", 0.5).on("end", breatheGlow);
+    }, order.core * 150 + 500);
 
     setTimeout(function () {
       linkSel.each(function (l) {
-        if (l.animated) { startPulse(this); }
+        var trunk = !!l.animated;
+        startPulse(this, trunk ? "#f2d9a8" : linkColor(l), trunk ? 4 : 2.6, trunk ? 1300 : 2100);
       });
-    }, 900);
+    }, 1100);
   }
 
   if ("IntersectionObserver" in window) {
