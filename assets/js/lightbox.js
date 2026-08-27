@@ -43,7 +43,12 @@
     var projectImg = e.target.closest && e.target.closest('.project img');
     if (!projectImg) { return; }
     e.preventDefault();
-    open(projectImg.currentSrc || projectImg.src, projectImg.getAttribute('data-title'), projectImg);
+    // Grid tiles load a downscaled thumbnail and carry the full-size
+    // original on data-full; open that so the lightbox is not showing a
+    // 900px image blown up full-browser. The two featured images in
+    // index.html have no data-full and fall through to their own src.
+    var full = projectImg.getAttribute('data-full');
+    open(full || projectImg.currentSrc || projectImg.src, projectImg.getAttribute('data-title'), projectImg);
   });
 
   closeBtn.addEventListener('click', close);

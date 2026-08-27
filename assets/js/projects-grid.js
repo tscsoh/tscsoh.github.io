@@ -30,6 +30,19 @@ const projects = [
   { src: "assets/img/3dblock.jpg", title: "3D Block Environment Model", target: "project_21" }
 ];
 
+/*
+ * Each tile renders into a box at most ~470px wide, so the grid loads a
+ * 900px-wide copy from assets/img/thumbs/ instead of the full-size
+ * original. On screen it is the same picture; the difference is decode
+ * memory, and with 21 tiles on one page that is what a phone actually
+ * runs out of — the whole grid drops from ~32MP of decoded pixels to
+ * ~13MP. The untouched original stays on data-full so the lightbox can
+ * still open it at full resolution (see lightbox.js).
+ */
+function thumbFor(src) {
+  return src.replace('assets/img/', 'assets/img/thumbs/');
+}
+
 $(document).ready(function() {
   let projectHtml = '';
 
@@ -37,7 +50,7 @@ $(document).ready(function() {
     projectHtml += `
       <div class="col-lg-4 col-md-6 col-sm-6">
         <div class="project add-animation animation-${(index % 3) + 1}">
-          <img src="${project.src}" style="width: 100%; object-fit: cover; height: 400px;" loading="lazy" decoding="async" data-title="${project.title}" />
+          <img src="${thumbFor(project.src)}" data-full="${project.src}" style="width: 100%; object-fit: cover; height: 400px;" loading="lazy" decoding="async" data-title="${project.title}" />
           <div class="project-caption"><span>${project.title}</span></div>
         </div>
       </div>
