@@ -125,6 +125,10 @@ $(window).load(function () {
 
 //activate collapse right menu when the windows is resized 
 $(window).resize(function () {
+    // Width may have crossed the hero's 1280px breakpoint, which changes
+    // --hero-zoom; drop the cached value so the next frame re-reads it.
+    $('.parallax > img').removeData('resolvedZoom');
+
     if ($(window).width() < 992) {
         rubik.initRightMenu();
         rubik.checkResponsiveImage();
@@ -340,7 +344,7 @@ rubik = {
         }
     }, 17),
 
-    checkScrollForParallax: debounce(function () {
+    checkScrollForParallax: rafThrottle(function () {
         no_of_elements = 0;
         $('.parallax').each(function () {
             var $elem = $(this);
@@ -349,16 +353,36 @@ rubik = {
                 var parent_top = $elem.offset().top;
                 var window_bottom = $(window).scrollTop();
                 var $image = $elem.children('img');
-                var zoom = $image.data('zoom') || 1;
+
+                if (!$image.length) {
+                    return;
+                }
+
+                // The hero's zoom varies by breakpoint, so CSS owns the
+                // value (--hero-zoom in site-overrides.css). This handler
+                // rewrites transform inline on every frame and would
+                // otherwise pin every viewport back to the markup's
+                // data-zoom. Resolve it once and cache it on the element:
+                // getComputedStyle forces a style recalc, which is not
+                // something to pay for on every frame of a scroll. The
+                // resize handler below clears the cache so a viewport that
+                // crosses the breakpoint picks up the new value.
+                var zoom = $image.data('resolvedZoom');
+
+                if (zoom === undefined) {
+                    var css_zoom = parseFloat(window.getComputedStyle($image[0]).getPropertyValue('--hero-zoom'));
+                    zoom = isNaN(css_zoom) ? ($image.data('zoom') || 1) : css_zoom;
+                    $image.data('resolvedZoom', zoom);
+                }
 
                 oVal = ((window_bottom - parent_top) / 3);
                 $image.css('transform', 'translate3d(0px, ' + oVal + 'px, 0px) scale(' + zoom + ')');
             }
         });
 
-    }, 6),
+    }),
 
-    checkScrollForContentTransitions: debounce(function () {
+    checkScrollForContentTransitions: rafThrottle(function () {
         $('.content-with-opacity').each(function () {
             var $content = $(this);
 
@@ -375,7 +399,7 @@ rubik = {
 
             }
         });
-    }, 6),
+    }),
 
     showModal: function (button) {
         var id = $(button).data('target');
@@ -425,6 +449,31 @@ rubik = {
         });
     },
 }
+
+// Scroll-driven *motion* has to land once per painted frame. debounce()
+// below defers on a timer instead, so while a scroll is actually in
+// progress each new scroll event clears the pending call and the hero
+// image only catches up once the wheel or finger pauses — which reads as
+// the image jerking rather than gliding. requestAnimationFrame runs in
+// step with paint, so the parallax stays smooth. (debounce is still the
+// right tool for the navbar class toggle: a state change, not motion.)
+function rafThrottle(func) {
+    var queued = false;
+
+    return function () {
+        var context = this, args = arguments;
+
+        if (queued) {
+            return;
+        }
+
+        queued = true;
+        window.requestAnimationFrame(function () {
+            queued = false;
+            func.apply(context, args);
+        });
+    };
+};
 
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for

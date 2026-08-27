@@ -48,11 +48,55 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   }
 }
 #home.parallax > img {
+  --hero-zoom: 1.6;
   object-fit: cover;
   object-position: 50% 22%;
-  transform: scale(1.6);
+  transform: scale(var(--hero-zoom));
   transform-origin: 50% 22%;
   filter: brightness(0.3) contrast(1.15) saturate(0.7);
+}
+/* Wide desktops crop far tighter than narrow ones, for two compounding
+   reasons. First, the template sizes this <img> with min-width/min-height
+   100% and width/height auto (assets/css/styles.css), so the 1200x896
+   portrait is already blown up to the hero's full width before the zoom
+   applies — and because the resulting box keeps the photo's own aspect
+   ratio, object-fit/object-position above have nothing left to crop and
+   do nothing. Second, the 1.6x zoom then multiplies that, which past
+   ~1280px left only the face in frame. So above 1280px: hand the <img>
+   the hero's exact box so object-position genuinely drives the crop,
+   drop the zoom to 1, and lower the crop window to hold head-to-chest —
+   the framing the mobile .responsive-background below already gives.
+   The zoom lives in a custom property because checkScrollForParallax in
+   assets/js/script.js rewrites transform inline on every scroll frame;
+   it reads --hero-zoom, so this stays the only place the value is set. */
+@media (min-width: 1280px) {
+  #home.parallax > img {
+    --hero-zoom: 1;
+    width: 100%;
+    height: 100%;
+    object-position: 50% 14%;
+    transform-origin: 50% 14%;
+  }
+  /* The hero copy sits at a percentage of hero *height* while the photo's
+     scale is driven by hero *width*, so the two drift apart as the aspect
+     ratio changes: on 16:10 desktops the title settled onto the eye line.
+     Lifting it 6% clears the eyes at every wide aspect ratio. Scoped to
+     the same breakpoint so mobile and tablet keep the template's 44%. */
+  #home .content {
+    top: 38%;
+  }
+}
+/* "AI PLATFORM ARCHITECT" needs about 1570px of line box at this type size,
+   so below roughly 1590px (measured: it wraps at 1580, fits at 1600) the
+   title breaks to two lines. .content is centred on its top offset, so a
+   second line hangs half a line-height lower than a single one would and
+   lands squarely on the glasses. Lift the copy a further 6% across the
+   band that wraps, putting the last line back on the brow — the same
+   relationship the one-line widths above it have. */
+@media (min-width: 1280px) and (max-width: 1599px) {
+  #home .content {
+    top: 32%;
+  }
 }
 /* Below ~992px width, script.js swaps the <img> above for a plain
    background-image div (see checkResponsiveImage in script.js) —
