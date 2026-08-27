@@ -5,8 +5,42 @@
   <meta charset="utf-8" />
   <link rel="icon" type="image/png" href="assets/img/favicon-white.png">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <title>Todd Swepston</title>
+  <title>Todd Swepston — AI Platform Architect</title>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+  <!-- Search and link-preview metadata. Without a description Google
+       composes its own snippet from whatever it last crawled, which is how
+       a long-superseded job title ("AI Orchestration Engineer", the wording
+       on this page until 2026-07) kept showing up in results well after the
+       page itself changed. These tags state the title and summary
+       explicitly instead of leaving it to the crawler's discretion. -->
+  <meta name="description" content="Todd Swepston is an AI Platform Architect specialising in enterprise orchestration over local, self-hosted LLMs — request routing, retrieval, tool execution and guardrails inside the private network." />
+  <link rel="canonical" href="https://toddswepston.com/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://toddswepston.com/" />
+  <meta property="og:title" content="Todd Swepston — AI Platform Architect" />
+  <meta property="og:description" content="Enterprise AI orchestration over local, self-hosted LLMs. Previously with PNC, Battelle, Mayo Clinic and P&amp;G." />
+  <meta property="og:image" content="https://toddswepston.com/assets/img/Portrait.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Todd Swepston — AI Platform Architect" />
+  <meta name="twitter:description" content="Enterprise AI orchestration over local, self-hosted LLMs." />
+  <meta name="twitter:image" content="https://toddswepston.com/assets/img/Portrait.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Todd Swepston",
+    "jobTitle": "AI Platform Architect",
+    "url": "https://toddswepston.com/",
+    "email": "tswepsto@gmail.com",
+    "telephone": "+1-614-330-5864",
+    "image": "https://toddswepston.com/assets/img/Portrait.jpg",
+    "sameAs": ["https://www.linkedin.com/in/todd-swepston-435b11a/"]
+  }
+  </script>
 
   <link href="assets/css/bootstrap.css" rel="stylesheet" />
   <link href="assets/css/styles.css" rel="stylesheet" />
@@ -228,7 +262,11 @@
     <footer class="footer footer-color-white">
       <div class="container">
         <div class="copyright">
-          &copy; 2026 Todd Swepston | tswepsto@gmail.com
+          <!-- The year is filled in from the visitor's clock on load so it
+               never needs editing again. The hard-coded 2026 is the no-JS
+               fallback: it will go stale eventually, but showing a slightly
+               old year beats showing an empty gap. -->
+          &copy; <span id="copyright-year">2026</span> Todd Swepston | tswepsto@gmail.com
         </div>
       </div>
     </footer>
@@ -273,5 +311,13 @@
 <!--   D3 architecture diagram: enterprise orchestration over local LLMs   -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="assets/js/architecture-diagram.js"></script>
+
+<!--   footer copyright year, kept current without a yearly edit   -->
+<script>
+  (function () {
+    var el = document.getElementById('copyright-year');
+    if (el) { el.textContent = new Date().getFullYear(); }
+  })();
+</script>
 
 </html>

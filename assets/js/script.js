@@ -265,6 +265,14 @@ rubik = {
                 var scroll_target = $(this).data('id');
                 var scroll_trigger = $(this).data('scroll');
 
+                // Tapping an item in the drawer used to scroll the page
+                // behind it and leave the drawer sitting open over the
+                // destination — the only ways to close it were the toggle
+                // and the backdrop. Close it on any tap, scroll link or
+                // not. .nav-open only translates on X, so the drawer state
+                // does not affect the target's offset().top either way.
+                rubik.closeRightMenu();
+
                 if (scroll_trigger == true && scroll_target !== undefined) {
                     e.preventDefault();
 
@@ -279,12 +287,7 @@ rubik = {
             $toggle.click(function () {
 
                 if (rubik.misc.navbar_menu_visible == 1) {
-                    $('html').removeClass('nav-open');
-                    rubik.misc.navbar_menu_visible = 0;
-                    $('#bodyClick').remove();
-                    setTimeout(function () {
-                        $toggle.removeClass('toggled');
-                    }, 550);
+                    rubik.closeRightMenu();
 
                 } else {
                     setTimeout(function () {
@@ -293,12 +296,7 @@ rubik = {
 
                     div = '<div id="bodyClick"></div>';
                     $(div).appendTo("body").click(function () {
-                        $('html').removeClass('nav-open');
-                        rubik.misc.navbar_menu_visible = 0;
-                        $('#bodyClick').remove();
-                        setTimeout(function () {
-                            $toggle.removeClass('toggled');
-                        }, 550);
+                        rubik.closeRightMenu();
                     });
 
                     $('html').addClass('nav-open');
@@ -309,6 +307,19 @@ rubik = {
             navbar_initialized = true;
         }
 
+    },
+
+    // Single place that puts the mobile drawer away: the toggle, the
+    // backdrop and a tap on a nav item all route through here so they
+    // cannot drift apart. The 550ms wait before dropping .toggled lets
+    // the burger's close animation finish first.
+    closeRightMenu: function () {
+        $('html').removeClass('nav-open');
+        rubik.misc.navbar_menu_visible = 0;
+        $('#bodyClick').remove();
+        setTimeout(function () {
+            $('.navbar-toggle').removeClass('toggled');
+        }, 550);
     },
 
     checkResponsiveImage: function () {
