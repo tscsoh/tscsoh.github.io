@@ -15,6 +15,26 @@
 (function () {
   "use strict";
 
+  // Locks the hero's height to a plain pixel value computed once, instead
+  // of leaving it sized by svh/vh. svh is supposed to stay fixed while
+  // Safari's address bar hides/shows on scroll, but on some iOS versions
+  // the element still visibly jitters through that exact transition —
+  // confirmed via a frame-by-frame recording where the hero repeatedly
+  // snapped in and out for a few seconds right as the user started
+  // scrolling. A height in px has nothing left to recalculate, so there's
+  // nothing for the toolbar animation to jitter. Only re-measured on an
+  // actual device rotation, not on every resize (the toolbar hide/show
+  // that caused this in the first place also fires as a resize event).
+  function lockHeroHeight() {
+    var hero = document.getElementById('home');
+    if (!hero || window.innerWidth > 768) { return; }
+    hero.style.height = Math.round(window.innerHeight * 0.8) + 'px';
+  }
+  lockHeroHeight();
+  window.addEventListener('orientationchange', function () {
+    setTimeout(lockHeroHeight, 300);
+  });
+
   var reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var h1 = document.querySelector('#home h1.responsive-small');
