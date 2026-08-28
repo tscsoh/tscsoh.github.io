@@ -226,7 +226,6 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   transition: opacity 0.35s ease;
   pointer-events: none;
 }
-.section-with-hover .project:hover .project-caption { opacity: 1; }
 .section-with-hover .project-caption span {
   font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -237,15 +236,28 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   transform: translateY(6px);
   transition: transform 0.35s ease;
 }
-.section-with-hover .project:hover .project-caption span { transform: translateY(0); }
 .section-with-hover .project img { transition: transform 0.6s ease, filter 0.6s ease; }
-.section-with-hover .project:hover img { transform: scale(1.035); }
+/* Touchscreens have no hover, so a tap is what fires :hover — and it then
+   sticks until something else is tapped. That turned "tap a tile to open
+   it in the lightbox" into "tile goes dark under the caption scrim and
+   stays dark after the lightbox closes". Gate the whole hover treatment
+   on a device that can actually hover, so a tap only ever opens the
+   lightbox. (hover: hover) alone would still match a touchscreen with a
+   mouse attached, hence pointer: fine as well. */
+@media (hover: hover) and (pointer: fine) {
+  .section-with-hover .project:hover .project-caption { opacity: 1; }
+  .section-with-hover .project:hover .project-caption span { transform: translateY(0); }
+  .section-with-hover .project:hover img { transform: scale(1.035); }
+}
 
 /* Both the two featured images and the 21-tile grid open in the
    lightbox below on click. */
 #projects .project,
 .section-with-hover .project {
   cursor: pointer;
+  /* Suppress the browser's own grey tap flash over the photo; the
+     lightbox opening is feedback enough. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ---- lightbox -------------------------------------------------
