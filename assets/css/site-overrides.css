@@ -27,33 +27,89 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   text-decoration: none;
 }
 
-/* ---- frontier organization reference link -------------------
-   A restrained editorial handoff from the home-page process view
+/* ---- frontier organization feature ---------------------------
+   A prominent editorial handoff from the home-page process view
    to the deeper provider-neutral architecture case study. */
-.frontier-architecture-link {
-  margin: 30px auto 8px;
-  text-align: center;
+.frontier-architecture-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 36px;
+  align-items: center;
+  margin: 44px auto 10px;
+  padding: 34px 38px;
+  border-top: 3px solid #c5a47e;
+  background: #08090b;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+  color: #fff;
+  text-align: left;
 }
-.frontier-architecture-link a {
+.frontier-architecture-feature-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #c5a47e;
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.frontier-architecture-feature h3 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-family: "Slim-Joe", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.frontier-architecture-feature p {
+  max-width: 700px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.frontier-architecture-feature-action {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0 8px;
-  border-bottom: 1px solid #c5a47e;
-  color: #6f573d;
+  justify-content: center;
+  gap: 13px;
+  min-height: 50px;
+  padding: 15px 20px;
+  background: #c5a47e;
+  color: #08090b;
   font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   letter-spacing: 0.11em;
+  line-height: 1.2;
+  text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-  transition: color 0.2s ease, gap 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.frontier-architecture-link a:hover,
-.frontier-architecture-link a:focus {
-  color: #242424;
-  gap: 17px;
+.frontier-architecture-feature-action:hover,
+.frontier-architecture-feature-action:focus {
+  background: #fff;
+  color: #08090b;
   text-decoration: none;
+  transform: translateY(-2px);
+}
+.frontier-architecture-feature-action:focus-visible {
+  outline: 2px solid #fff !important;
+  outline-offset: 4px;
+}
+@media (max-width: 768px) {
+  .frontier-architecture-feature {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+  .frontier-architecture-feature-action {
+    width: 100%;
+  }
 }
 
 /* ---- hero portrait ------------------------------------------
