@@ -24,11 +24,11 @@
     body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Verlag", "Helvetica Neue", Arial, sans-serif; }
     a { color: inherit; }
     .site-nav {
-      position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center;
+      position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
       min-height: 68px; padding: 0 clamp(20px, 5vw, 72px); background: rgba(8, 9, 11, .94);
       color: #fff; border-bottom: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(14px);
     }
-    .nav-home { display: flex; align-items: center; justify-self: start; }
+    .nav-home { display: flex; align-items: center; gap: 18px; }
     .back-link {
       display: inline-flex; align-items: center; gap: 9px; min-height: 38px; padding: 8px 12px;
       border: 1px solid rgba(197,164,126,.72); color: #fff; font-size: 11px; font-weight: 700;
@@ -37,8 +37,8 @@
     }
     .back-link:hover, .back-link:focus { border-color: var(--gold); background: var(--gold); color: var(--night); }
     .back-link:focus-visible, .back-to-top:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-    .brand { justify-self: center; white-space: nowrap; font-family: "Slim Joe", "Helvetica Neue", sans-serif; font-size: 19px; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
-    .site-nav nav { display: flex; justify-self: end; gap: clamp(16px, 2.5vw, 34px); }
+    .brand { display: inline-flex; align-items: center; min-height: 38px; white-space: nowrap; font-family: "Slim Joe", "Helvetica Neue", sans-serif; font-size: 19px; line-height: 1; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+    .site-nav nav { display: flex; gap: clamp(16px, 2.5vw, 34px); }
     .site-nav nav a { color: rgba(255,255,255,.72); font-size: 12px; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
     .site-nav nav a:hover { color: var(--gold); }
     .hero { color: #fff; background: var(--night); padding: clamp(82px, 12vw, 154px) max(5vw, 24px) clamp(72px, 10vw, 126px); }
@@ -247,7 +247,8 @@
     @media (max-width: 600px) {
       .site-nav { min-height: 60px; }
       .site-nav nav a:not(:first-child) { display: none; }
-      .brand { display: none; }
+      .nav-home { gap: 0; }
+      .nav-home .brand { display: none; }
       .back-link { min-height: 36px; padding: 7px 10px; font-size: 10px; }
       .hero { padding-top: 70px; }
       .diagram-toolbar { align-items: flex-start; }
@@ -269,8 +270,8 @@
   <header class="site-nav">
     <div class="nav-home">
       <a class="back-link" href="../"><span aria-hidden="true">←</span> Back to main site</a>
+      <a class="brand" href="../">Todd Swepston</a>
     </div>
-    <a class="brand" href="../">Todd Swepston</a>
     <nav aria-label="Page navigation"><a href="#architecture">Architecture</a><a href="#elastic-deployment">Scaling</a><a href="#operating-model">Operating model</a><a href="#validation">Validation</a></nav>
   </header>
 
