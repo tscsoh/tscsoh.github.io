@@ -35,7 +35,7 @@ var no_touch_screen = false;
 
 var burger_menu;
 
-// / Projects — see assets/js/projects-grid.js for the data + render logic.
+// / Projects - see assets/js/projects-grid.js for the data + render logic.
 
 // Process images scaling
 function setConditionalHeight() {
@@ -267,7 +267,7 @@ rubik = {
 
                 // Tapping an item in the drawer used to scroll the page
                 // behind it and leave the drawer sitting open over the
-                // destination — the only ways to close it were the toggle
+                // destination - the only ways to close it were the toggle
                 // and the backdrop. Close it on any tap, scroll link or
                 // not. .nav-open only translates on X, so the drawer state
                 // does not affect the target's offset().top either way.
@@ -464,7 +464,7 @@ rubik = {
 // Scroll-driven *motion* has to land once per painted frame. debounce()
 // below defers on a timer instead, so while a scroll is actually in
 // progress each new scroll event clears the pending call and the hero
-// image only catches up once the wheel or finger pauses — which reads as
+// image only catches up once the wheel or finger pauses - which reads as
 // the image jerking rather than gliding. requestAnimationFrame runs in
 // step with paint, so the parallax stays smooth. (debounce is still the
 // right tool for the navbar class toggle: a state change, not motion.)

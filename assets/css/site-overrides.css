@@ -117,7 +117,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    moody, tightly-cropped treatment. */
 /* Mobile browsers resize their visible viewport as the address bar
    collapses/expands on scroll, and plain vh units are recalculated
-   against that changing height — so a section sized in vh visibly
+   against that changing height - so a section sized in vh visibly
    grows or shrinks a moment into every scroll. svh ("small viewport
    height") is pinned to the viewport size when browser chrome is
    fully shown and never changes, eliminating the jump. Declared
@@ -144,12 +144,12 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    reasons. First, the template sizes this <img> with min-width/min-height
    100% and width/height auto (assets/css/styles.css), so the 1200x896
    portrait is already blown up to the hero's full width before the zoom
-   applies — and because the resulting box keeps the photo's own aspect
+   applies - and because the resulting box keeps the photo's own aspect
    ratio, object-fit/object-position above have nothing left to crop and
    do nothing. Second, the 1.6x zoom then multiplies that, which past
    ~1280px left only the face in frame. So above 1280px: hand the <img>
    the hero's exact box so object-position genuinely drives the crop,
-   drop the zoom to 1, and lower the crop window to hold head-to-chest —
+   drop the zoom to 1, and lower the crop window to hold head-to-chest -
    the framing the mobile .responsive-background below already gives.
    The zoom lives in a custom property because checkScrollForParallax in
    assets/js/script.js rewrites transform inline on every scroll frame;
@@ -176,7 +176,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    title breaks to two lines. .content is centred on its top offset, so a
    second line hangs half a line-height lower than a single one would and
    lands squarely on the glasses. Lift the copy a further 6% across the
-   band that wraps, putting the last line back on the brow — the same
+   band that wraps, putting the last line back on the brow - the same
    relationship the one-line widths above it have. */
 @media (min-width: 1280px) and (max-width: 1599px) {
   #home .content {
@@ -184,11 +184,11 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   }
 }
 /* Below ~992px width, script.js swaps the <img> above for a plain
-   background-image div (see checkResponsiveImage in script.js) —
+   background-image div (see checkResponsiveImage in script.js) -
    it needs the same crop/darken treatment applied here separately.
    The template gives this div its own unconditional height: 80vh
    (assets/css/styles.css), while its parent only drops to 80vh under
-   a max-width: 768px media query — so on any viewport from ~769 to
+   a max-width: 768px media query - so on any viewport from ~769 to
    991px wide (tablets, large phones) the two heights mismatch and a
    gap opens below the hero, showing the div's tan fallback
    background-color. Tying height to the parent (100%) and matching
@@ -211,7 +211,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
 }
 /* Slim-Joe (the hero display font, also used for the "Todd Swepston"
-   navbar brand) only ships one weight — thin — and there's no bold
+   navbar brand) only ships one weight - thin - and there's no bold
    face to fall back on, so font-weight: bold does nothing real
    (browsers can only fake-skew it). At the smaller size mobile
    renders it at, the thin strokes get lost. A slim text-stroke in
@@ -225,7 +225,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 }
 
 /* De-emphasize the hero contact info from two giant stacked lines
-   into one quiet, tracked-out strip — the phone number doesn't
+   into one quiet, tracked-out strip - the phone number doesn't
    need to shout as loud as the title. */
 #home .content h5 {
   display: block;
@@ -246,7 +246,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    Paired with assets/js/hero-intro.js, which splits the title into
    one <span class="hero-char"> per character and staggers each
    one's animation-delay. Title characters settle in first (blur +
-   rise + fade), then the separator, then the contact info — a short
+   rise + fade), then the separator, then the contact info - a short
    choreographed "power-on" rather than everything appearing at once.
    Skipped under prefers-reduced-motion (the JS bails out entirely,
    so these rules simply never find anything to apply to). */
@@ -292,7 +292,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
    This row has no .container wrapper to supply the padding that
    normally offsets Bootstrap's -15px row margin, so below the
    template's own 992px override that row overflowed its section
-   by 30px on every phone/tablet width — zero it out unconditionally. */
+   by 30px on every phone/tablet width - zero it out unconditionally. */
 .section-we-made-1.section-with-hover .row {
   margin: 0;
 }
@@ -322,7 +322,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   transition: transform 0.35s ease;
 }
 .section-with-hover .project img { transition: transform 0.6s ease, filter 0.6s ease; }
-/* Touchscreens have no hover, so a tap is what fires :hover — and it then
+/* Touchscreens have no hover, so a tap is what fires :hover - and it then
    sticks until something else is tapped. That turned "tap a tile to open
    it in the lightbox" into "tile goes dark under the caption scrim and
    stays dark after the lightbox closes". Gate the whole hover treatment

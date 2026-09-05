@@ -1,5 +1,5 @@
 /*
- * How I Architect AI Systems — D3 architecture diagram
+ * How I Architect AI Systems - D3 architecture diagram
  * Enterprise orchestration over local, self-hosted LLMs.
  * Requires D3 v7 (loaded via CDN in index.html) and
  * assets/css/architecture-diagram.css for styling.
@@ -18,11 +18,11 @@
     tools:  "#d81f74",   // Prototype (pink)
     guard:  "#54269e",   // Design    (purple)
     obs:    "#c99b1f",   // Deliver   (gold, darkened slightly for text contrast)
-    core:   "#c5a47e",   // site's own brand gold — ties to the rest of the page
+    core:   "#c5a47e",   // site's own brand gold - ties to the rest of the page
     neutral:"#8a8a8a"
   };
 
-  // ---- node data (fixed layout — this is a real, working reference
+  // ---- node data (fixed layout - this is a real, working reference
   // architecture, not a random graph). Every node keeps at least 20
   // logical units of clearance from the SVG/boundary edges. -----------
   var nodes = [
@@ -57,7 +57,7 @@
     { id: "vector-db",   label: "Vector DB",     icon: "", sub: "pgvector · embeddings", x: 405, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.rag,
       desc: "Stores document embeddings for retrieval-augmented generation, running as a Postgres extension inside the private network." },
     { id: "internal-api", label: "Internal APIs", icon: "", sub: "CRM · ERP · WMS", x: 592, y: 524, w: 108, h: 64, type: "data", accent: PALETTE.tools, compact: true,
-      desc: "Read/write access to internal systems of record — CRM, ERP and warehouse management — called only through the tool sandbox." },
+      desc: "Read/write access to internal systems of record - CRM, ERP and warehouse management - called only through the tool sandbox." },
     { id: "external-api", label: "External APIs", icon: "", sub: "Allow-listed only", x: 708, y: 524, w: 108, h: 64, type: "data", accent: PALETTE.tools, compact: true,
       desc: "A narrow, explicitly allow-listed set of third-party APIs, reached through an egress proxy for auditability." },
     { id: "audit",       label: "Audit Log",     icon: "", sub: "SIEM · immutable trail", x: 895, y: 524, w: 210, h: 64, type: "data", accent: PALETTE.guard,
@@ -74,7 +74,7 @@
     { s: "orchestrator", t: "tools" },
     { s: "orchestrator", t: "guardrails" },
     { s: "orchestrator", t: "observability" },
-    // Not chains — the router picks ONE of these two models per request
+    // Not chains - the router picks ONE of these two models per request
     // ("routes by task, cost & latency"), and the tool sandbox calls
     // EITHER an internal system or an allow-listed external API. Both
     // pairs are peer destinations, drawn side by side, each with its
@@ -86,7 +86,7 @@
     { s: "tools", t: "external-api" },
     { s: "guardrails", t: "audit" },
     // Session/conversation state is the orchestrator's own concern
-    // (see its "Session Ctx" subtitle) — not Observability's.
+    // (see its "Session Ctx" subtitle) - not Observability's.
     { s: "orchestrator", t: "datastore", side: true }
   ];
 
@@ -109,12 +109,12 @@
     return "M" + sx + "," + sy + " V" + midY + " H" + tx + " V" + ty;
   }
 
-  // Same elbow shape, shifted sideways by `off` — used only as an
+  // Same elbow shape, shifted sideways by `off` - used only as an
   // invisible guide path so the request pulse and the response pulse
   // each get their own lane instead of overlapping on the visible line.
   // The elbow has two orientations (vertical run, horizontal run), so
   // "sideways" means different axes for each: the two vertical segments
-  // shift in x, the horizontal segment shifts in y — offsetting only x
+  // shift in x, the horizontal segment shifts in y - offsetting only x
   // (as an earlier version did) left the horizontal segment unshifted,
   // so both lanes still overlapped anywhere the link ran horizontally.
   function elbowOffset(s, t, off) {
@@ -152,7 +152,7 @@
     .attr("role", "img");
 
   // ---- soft glow filters, reused across nodes/links for a high-tech
-  // but restrained look (no filter is on by default — applied via class) --
+  // but restrained look (no filter is on by default - applied via class) --
   var defs = svg.append("defs");
   [["glow-soft", 2.2], ["glow-strong", 4.5]].forEach(function (spec) {
     var f = defs.append("filter")
@@ -170,7 +170,7 @@
   var gPulses = svg.append("g");
   var gNodes = svg.append("g");
 
-  // soft ambient glow that breathes behind the orchestrator — draws the
+  // soft ambient glow that breathes behind the orchestrator - draws the
   // eye to the hub of the system without being a distraction
   var core = byId.orchestrator;
   var coreGlow = gGlow.append("rect")
@@ -208,7 +208,7 @@
     .attr("opacity", 0);
 
   // line-draw reveal: each path starts fully hidden behind its own length
-  // in dashes, then "draws itself" open — reads as a schematic powering on
+  // in dashes, then "draws itself" open - reads as a schematic powering on
   linkSel.each(function () {
     var len = this.getTotalLength();
     d3.select(this)
@@ -272,7 +272,7 @@
     .text(function (n) { return n.icon; });
 
   // compact: true marks the narrower side-by-side pairs (the two LLMs,
-  // internal/external APIs) — smaller type so their labels still fit
+  // internal/external APIs) - smaller type so their labels still fit
   // at roughly half the width of every other node.
   nodeSel.append("text")
     .attr("class", "arch-label")
@@ -420,9 +420,9 @@
         // Every link is a request/response pair, not a one-way call.
         // Request pulses run full-brightness along the +LANE guide
         // (source→target); response pulses run dimmer, smaller, along
-        // the separate -LANE guide (target→source) — two lanes side by
+        // the separate -LANE guide (target→source) - two lanes side by
         // side on the line instead of one dot chasing another. Several
-        // pulses per direction, staggered, so each reads as a stream —
+        // pulses per direction, staggered, so each reads as a stream -
         // stagger spacing scales with this link's own travel time (its
         // length ÷ PULSE_VELOCITY) so the gaps between pulses look even
         // whether the link is short or long.

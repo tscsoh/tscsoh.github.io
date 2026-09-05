@@ -2,14 +2,14 @@
  * Hero load-in sequence: splits the hero title into individual
  * characters and staggers them in (blur + rise + fade), then the
  * separator, then the contact info follow in turn. Purely a visual
- * flourish — skipped entirely under prefers-reduced-motion, and the
+ * flourish - skipped entirely under prefers-reduced-motion, and the
  * title keeps a full aria-label so screen readers get the plain text
  * instead of one node per character.
  *
  * Re-runs on bfcache restoration (navigating back/forward to this
  * page): browsers restore the page without re-executing scripts, so
  * without this the title would just sit in its already-finished
- * state — no visible animation — even though a hard refresh looks
+ * state - no visible animation - even though a hard refresh looks
  * fine (a refresh always re-runs everything from scratch).
  */
 (function () {
@@ -18,7 +18,7 @@
   // Locks the hero's height to a plain pixel value computed once, instead
   // of leaving it sized by svh/vh. svh is supposed to stay fixed while
   // Safari's address bar hides/shows on scroll, but on some iOS versions
-  // the element still visibly jitters through that exact transition —
+  // the element still visibly jitters through that exact transition -
   // confirmed via a frame-by-frame recording where the hero repeatedly
   // snapped in and out for a few seconds right as the user started
   // scrolling. A height in px has nothing left to recalculate, so there's
@@ -81,7 +81,7 @@
   }
 
   // Restarts a CSS animation on an already-present element (used for the
-  // separator/contact info, which — unlike the title — aren't rebuilt
+  // separator/contact info, which - unlike the title - aren't rebuilt
   // from scratch, so simply existing in a restored DOM doesn't replay
   // their animation on its own).
   function restartAnimation(el) {

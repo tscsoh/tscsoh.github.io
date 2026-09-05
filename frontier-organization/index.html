@@ -6,9 +6,9 @@
   <meta name="description" content="A current, source-validated logical reference architecture for a provider-neutral organization of frontier AI models.">
   <link rel="canonical" href="https://toddswepston.com/frontier-organization/">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Frontier Organization Architecture — Todd Swepston">
+  <meta property="og:title" content="Frontier Organization Architecture - Todd Swepston">
   <meta property="og:description" content="A source-validated logical architecture for coordinating specialist agents across frontier model providers.">
-  <title>Frontier Organization Architecture — Todd Swepston</title>
+  <title>Frontier Organization Architecture - Todd Swepston</title>
   <style>
     @font-face { font-family: "Slim Joe"; src: url("https://toddswepston.com/assets/fonts/Slim-Joe/Slim-Joe.woff") format("woff"); font-display: swap; }
     @font-face { font-family: "Verlag"; src: url("https://toddswepston.com/assets/fonts/Verlag-Book/Verlag-Book.woff") format("woff"); font-weight: 400; font-display: swap; }
@@ -182,7 +182,7 @@
       <div class="hero-inner">
         <span class="eyebrow">Reference architecture · AI platform engineering</span>
         <h1>One organization.<br>Many frontier models.</h1>
-        <p>A provider-neutral logical reference architecture for assigning specialist model workers on demand—with Temporal-backed workflow durability, explicit policy controls, and evidence-based completion criteria.</p>
+        <p>A provider-neutral logical reference architecture for assigning specialist model workers on demand - with Temporal-backed workflow durability, explicit policy controls, and evidence-based completion criteria.</p>
         <div class="hero-meta"><span>Portable roles</span><span>Dynamic assignment</span><span>Durable workflow state</span><span>Separated workspaces</span></div>
       </div>
     </section>
@@ -430,7 +430,7 @@
             </svg>
           </div>
           <div class="diagram-note">Swipe horizontally to inspect the architecture at a readable scale.</div>
-          <div class="diagram-assurance"><strong>Scope and implementation constraints.</strong> External providers and tool systems sit beyond the rose dashed service boundaries. The official Temporal–LangGraph integration is a Python Public Preview: every graph node or task must declare Workflow or Activity execution, and model, network, database, and file I/O belong in Activities. Git worktrees separate Git working state; use process or container sandboxes when execution isolation is required. OpenTelemetry exports telemetry to an observability backend, which is intentionally not shown.</div>
+          <div class="diagram-assurance"><strong>Scope and implementation constraints.</strong> External providers and tool systems sit beyond the rose dashed service boundaries. The official Temporal-LangGraph integration is a Python Public Preview: every graph node or task must declare Workflow or Activity execution, and model, network, database, and file I/O belong in Activities. Git worktrees separate Git working state; use process or container sandboxes when execution isolation is required. OpenTelemetry exports telemetry to an observability backend, which is intentionally not shown.</div>
           <div class="legend" aria-label="Diagram legend"><span><i></i>Runtime request or transition</span><span><i class="dashed"></i>Policy or control dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>State, evidence, or telemetry export</span><span><i style="border-color:#159a9c"></i>External integration request</span><span><i style="border-color:#b54f77"></i>Approval signal</span><span><i class="boundary"></i>Logical scope</span><span><i class="external-boundary"></i>External service boundary</span></div>
         </figure>
       </div>
@@ -440,10 +440,10 @@
       <div class="content">
         <div class="section-head"><div><span class="section-label">Operating model</span><h2>Persistent definitions. Ephemeral teams.</h2></div><p>The organization definition is a versioned application artifact. Each objective can create a temporary set of specialist worker nodes operating under explicit policy; this behavior is implemented by the application graph rather than supplied automatically by any one platform.</p></div>
         <div class="details-grid">
-          <article class="detail"><span>01</span><div><h3>Portable organization</h3><p>A versioned YAML, TOML, or equivalent application schema can define roles, authority, model policy, assignment rules, budgets, and typed work contracts. This schema is an architectural design choice—not a LangGraph or Temporal standard.</p></div></article>
+          <article class="detail"><span>01</span><div><h3>Portable organization</h3><p>A versioned YAML, TOML, or equivalent application schema can define roles, authority, model policy, assignment rules, budgets, and typed work contracts. This schema is an architectural design choice - not a LangGraph or Temporal standard.</p></div></article>
           <article class="detail"><span>02</span><div><h3>Durable workflow</h3><p>Temporal Service persists Workflow Event History and coordinates timers, Task Queues, retries, and Signals. External calls execute as Activities; write Activities must be designed for idempotent retry or explicit compensation.</p></div></article>
           <article class="detail"><span>03</span><div><h3>Graph orchestration</h3><p>A LangGraph application graph can implement planning, conditional routing, dynamic fan-out through the Send API, merging, and completion gates. Those behaviors come from application nodes and edges, not from an autonomous built-in organization.</p></div></article>
-          <article class="detail"><span>04</span><div><h3>Independent evaluation</h3><p>Specialists are selected through application policy. Prefer deterministic checks first; where an LLM judges another model, an independently chosen model family can reduce—but cannot eliminate—self- and family-preference risk.</p></div></article>
+          <article class="detail"><span>04</span><div><h3>Independent evaluation</h3><p>Specialists are selected through application policy. Prefer deterministic checks first; where an LLM judges another model, an independently chosen model family can reduce - but cannot eliminate - self- and family-preference risk.</p></div></article>
           <article class="detail"><span>05</span><div><h3>Model gateway</h3><p>LiteLLM can provide a common provider interface plus gateway authentication, authorization, routing, fallback, rate limits, spend tracking, and budgets. A custom capability registry preserves model-specific constraints rather than pretending all models are equivalent.</p></div></article>
           <article class="detail"><span>06</span><div><h3>Tools and isolation</h3><p>An MCP host creates clients that communicate with focused servers and must enforce consent and security policy. Git worktrees separate working directories and branches; they are not security sandboxes. Use containers or equivalent process isolation for untrusted execution.</p></div></article>
           <article class="detail"><span>07</span><div><h3>State and evidence</h3><p>Temporal owns durable Workflow Event History. PostgreSQL and artifact storage are optional application choices for cross-run state and retained evidence; they do not replace Temporal durability or a LangGraph checkpointer within the official integration.</p></div></article>

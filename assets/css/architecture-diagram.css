@@ -1,5 +1,5 @@
 /* ============================================================
-   "How I Architect AI Systems" — D3 architecture diagram
+   "How I Architect AI Systems" - D3 architecture diagram
    Enterprise orchestration over local, self-hosted LLMs.
    Paired with assets/js/architecture-diagram.js.
 ============================================================ */
@@ -16,7 +16,7 @@
 
 /* Below tablet width, shrinking the SVG to fit the screen makes its
    labels unreadable. Instead of scaling down, render it at a fixed
-   readable size and let the container scroll horizontally — same
+   readable size and let the container scroll horizontally - same
    diagram, same text size, just wider than the screen. */
 @media (max-width: 768px) {
   #arch-diagram {
@@ -43,7 +43,7 @@
 #arch-diagram .arch-node .arch-sub { fill: #999999; }
 #arch-diagram .arch-node.dim { opacity: 0.28; }
 #arch-diagram .arch-node { cursor: pointer; }
-/* Only the hover dim/undim should ease — added after the entrance
+/* Only the hover dim/undim should ease - added after the entrance
    animation finishes. A blanket transition here fights d3's own
    opacity transition during entrance: every interpolated attribute
    frame restarts a new CSS transition toward a target that's already

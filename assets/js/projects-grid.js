@@ -35,7 +35,7 @@ const projects = [
  * 900px-wide copy from assets/img/thumbs/ instead of the full-size
  * original. On screen it is the same picture; the difference is decode
  * memory, and with 21 tiles on one page that is what a phone actually
- * runs out of — the whole grid drops from ~32MP of decoded pixels to
+ * runs out of - the whole grid drops from ~32MP of decoded pixels to
  * ~13MP. The untouched original stays on data-full so the lightbox can
  * still open it at full resolution (see lightbox.js).
  */
