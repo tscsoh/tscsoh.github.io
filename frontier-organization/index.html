@@ -57,19 +57,6 @@
     .diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--line); background: var(--soft); }
     .diagram-id { font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
     .diagram-meta { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-    .diagram-open {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 8px 12px;
-      border: 1px solid var(--gold-dark); background: var(--night); color: #fff; cursor: pointer;
-      font: inherit; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-      transition: background .2s ease, color .2s ease;
-    }
-    .diagram-open:hover, .diagram-open:focus { background: var(--gold); color: var(--night); }
-    .diagram-open:focus-visible, .viewer-button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-    .diagram-interaction-help {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 7px 14px; padding: 10px 18px;
-      border-bottom: 1px solid var(--line); background: #fff; color: #666; font-size: 11px; line-height: 1.5;
-    }
-    .diagram-interaction-help strong { color: var(--ink); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     kbd {
       display: inline-block; min-width: 22px; padding: 1px 5px; border: 1px solid #c7c7c7;
       background: var(--soft); color: #444; font: 700 10px/1.5 "Verlag", "Helvetica Neue", Arial, sans-serif; text-align: center;
@@ -78,8 +65,22 @@
     .diagram-scroll svg { display: block; width: 100%; min-width: 1120px; height: auto; }
     .diagram-scroll svg.diagram { cursor: zoom-in; }
     .diagram-placeholder { width: 100%; background: var(--soft); }
-    .diagram-note { display: none; padding: 9px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; text-align: center; }
-    .diagram-assurance { padding: 12px 18px; border-top: 1px solid var(--line); background: #fbfaf8; color: #666; font-size: 12px; line-height: 1.55; }
+    .diagram-actions { display: flex; justify-content: flex-end; min-height: 54px; padding: 8px 12px; border-top: 1px solid var(--line); background: #fff; }
+    .icon-button {
+      position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0;
+      border: 1px solid #777; background: #fff; color: var(--ink); cursor: pointer; font: inherit;
+      transition: border-color .2s ease, background .2s ease, color .2s ease;
+    }
+    .icon-button:hover, .icon-button:focus { border-color: var(--gold-dark); background: var(--night); color: #fff; }
+    .icon-button:focus-visible { outline: 2px solid var(--gold-dark); outline-offset: 3px; }
+    .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
+    .icon-button[data-tooltip]::after {
+      position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 4; padding: 6px 8px;
+      background: var(--night); color: #fff; content: attr(data-tooltip); font-size: 10px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none;
+      transform: translateY(4px); transition: opacity .16s ease, transform .16s ease;
+    }
+    .icon-button[data-tooltip]:hover::after, .icon-button[data-tooltip]:focus-visible::after { opacity: 1; transform: translateY(0); }
     .legend { display: flex; flex-wrap: wrap; gap: 18px 28px; padding: 15px 18px; border-top: 1px solid var(--line); color: #666; font-size: 12px; }
     .legend span { display: inline-flex; align-items: center; gap: 8px; }
     .legend i { display: inline-block; width: 28px; border-top: 2px solid #555; }
@@ -208,32 +209,11 @@
     .back-to-top:hover, .back-to-top:focus { background: var(--gold); color: var(--night); transform: translateY(-2px); }
     body.diagram-viewer-open { overflow: hidden; }
     .diagram-viewer {
-      position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: clamp(10px, 2vw, 28px);
-      background: rgba(8,9,11,.88); backdrop-filter: blur(8px);
+      position: fixed; inset: 0; z-index: 1000; display: block; padding: 0; background: #fff;
     }
     .diagram-viewer[hidden] { display: none; }
-    .viewer-shell {
-      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; width: min(1600px, 100%); height: min(94vh, 1080px);
-      border: 1px solid rgba(197,164,126,.72); background: #fff; box-shadow: 0 24px 80px rgba(0,0,0,.45);
-    }
-    .viewer-toolbar {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; min-height: 58px; padding: 10px 14px;
-      border-bottom: 1px solid #333; background: var(--night); color: #fff;
-    }
-    .viewer-heading { min-width: 210px; margin-right: auto; }
-    .viewer-eyebrow { display: block; color: var(--gold); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-    .viewer-title { display: block; margin-top: 3px; font-size: 14px; font-weight: 700; }
-    .viewer-control-group { display: inline-flex; align-items: center; gap: 6px; }
-    .viewer-control-label { color: rgba(255,255,255,.68); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-    .viewer-button {
-      display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 38px; padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.32); background: transparent; color: #fff; cursor: pointer;
-      font: inherit; font-size: 12px; font-weight: 700;
-    }
-    .viewer-button:hover, .viewer-button:focus { border-color: var(--gold); background: var(--gold); color: var(--night); }
-    .viewer-button.wide { min-width: auto; gap: 7px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
-    .viewer-zoom-status { min-width: 52px; color: #fff; font-size: 11px; font-weight: 700; text-align: center; }
-    .viewer-stage { position: relative; min-height: 0; overflow: hidden; background: #fff; cursor: grab; touch-action: none; user-select: none; }
+    .viewer-shell { position: relative; width: 100%; height: 100dvh; overflow: hidden; background: #fff; }
+    .viewer-stage { position: absolute; inset: 0; overflow: hidden; background: #fff; cursor: grab; touch-action: none; user-select: none; }
     .viewer-stage.is-dragging { cursor: grabbing; }
     .viewer-stage:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
     .viewer-world { position: absolute; inset: 0; }
@@ -242,11 +222,14 @@
       shape-rendering: geometricPrecision; text-rendering: geometricPrecision;
     }
     .viewer-help {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 10px 14px;
-      border-top: 1px solid var(--line); background: var(--soft); color: #555; font-size: 11px; line-height: 1.55;
+      position: absolute; top: 16px; left: 16px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center;
+      max-width: calc(100% - 96px); gap: 6px 14px; padding: 8px 10px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.94); color: #555; font-size: 11px; line-height: 1.55; pointer-events: none;
     }
     .viewer-help strong { color: var(--ink); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     .viewer-help span { white-space: nowrap; }
+    .viewer-close { position: absolute; top: 16px; right: 16px; z-index: 3; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px max(5vw,24px); border-top: 1px solid #252525; color: rgba(255,255,255,.55); background: var(--night); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
     @media (max-width: 800px) {
       .site-nav nav a:nth-child(n + 2) { display: none; }
@@ -255,7 +238,6 @@
       .detail, .detail:nth-child(even) { padding: 22px 0; border-right: 0; }
       .reference { grid-template-columns: 105px 155px 1fr; }
       .reference a { grid-column: 3; text-align: left; }
-      .diagram-note { display: block; }
     }
     @media (max-width: 1400px) {
       .site-nav nav a:nth-child(n + 3) { display: none; }
@@ -267,23 +249,16 @@
       .back-link { min-height: 36px; padding: 7px 10px; font-size: 10px; }
       .hero { padding-top: 70px; }
       .diagram-toolbar { align-items: flex-start; }
-      .diagram-open { width: 100%; }
-      .diagram-interaction-help { align-items: flex-start; }
       .reference { grid-template-columns: 1fr; gap: 7px; }
       .reference a { grid-column: 1; }
       .back-to-top { right: 14px; bottom: 14px; padding: 10px 12px; }
-      .diagram-viewer { padding: 0; }
-      .viewer-shell { width: 100%; height: 100dvh; border: 0; }
-      .viewer-toolbar { gap: 8px; padding: 8px; }
-      .viewer-heading { flex-basis: 100%; }
-      .viewer-control-label { display: none; }
-      .viewer-help { gap: 6px 12px; padding: 8px 10px; }
+      .viewer-help { top: 10px; left: 10px; max-width: calc(100% - 72px); gap: 5px 10px; padding: 7px 8px; }
       .viewer-help span { white-space: normal; }
+      .viewer-close { top: 10px; right: 10px; }
       footer { flex-direction: column; }
     }
     @media (pointer: coarse) {
-      .diagram-open, .viewer-button { min-height: 44px; }
-      .viewer-button { min-width: 44px; }
+      .icon-button { width: 44px; height: 44px; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
@@ -318,9 +293,7 @@
           <figcaption class="diagram-toolbar">
             <span class="diagram-id">Provider-neutral synthetic organization</span>
             <span class="diagram-meta">Logical component + runtime flow · v1.2 · reviewed 5 September 2026</span>
-            <button class="diagram-open" type="button" data-diagram-target="architecture-diagram" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Explore diagram</button>
           </figcaption>
-          <div class="diagram-interaction-help"><strong>Interactive view</strong><span>Click the diagram or use Explore diagram.</span><span>Drag or arrow keys to pan.</span><span>Scroll or pinch to zoom.</span><span><kbd>+</kbd> <kbd>-</kbd> zoom</span><span><kbd>0</kbd> reset</span><span><kbd>Esc</kbd> close</span></div>
           <div class="diagram-scroll">
             <svg class="diagram" viewBox="0 0 1440 900" role="img" aria-labelledby="diagram-title diagram-desc">
               <title id="diagram-title">Provider-neutral frontier model organization reference architecture</title>
@@ -551,8 +524,7 @@
               <g class="zone-heading"><rect x="255" y="661" width="190" height="25" rx="3" class="zone-label-bg"/><text x="264" y="679" class="zone-label">STATE + EVIDENCE PLANE</text></g>
             </svg>
           </div>
-          <div class="diagram-note">Swipe horizontally to inspect the architecture at a readable scale.</div>
-          <div class="diagram-assurance"><strong>Scope and implementation constraints.</strong> External providers and tool systems sit beyond the rose dashed service boundaries. The official Temporal-LangGraph integration is a Python Public Preview: every graph node or task must declare Workflow or Activity execution, and model, network, database, and file I/O belong in Activities. Git worktrees separate Git working state; use process or container sandboxes when execution isolation is required. OpenTelemetry exports telemetry to an observability backend, which is intentionally not shown.</div>
+          <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="architecture-diagram" data-tooltip="Expand" aria-label="Expand architecture diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
           <div class="legend" aria-label="Diagram legend"><span><i></i>Runtime request or transition</span><span><i class="dashed"></i>Policy or control dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>State, evidence, or telemetry export</span><span><i style="border-color:#159a9c"></i>External integration request</span><span><i style="border-color:#b54f77"></i>Approval signal</span><span><i class="boundary"></i>Logical scope</span><span><i class="external-boundary"></i>External service boundary</span></div>
         </figure>
       </div>
@@ -569,9 +541,7 @@
           <figcaption class="diagram-toolbar">
             <span class="diagram-id">Provider-neutral synthetic organization</span>
             <span class="diagram-meta">Deployment + dynamic view · v1.0 · reviewed 5 September 2026</span>
-            <button class="diagram-open" type="button" data-diagram-target="elastic-deployment-diagram" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Explore diagram</button>
           </figcaption>
-          <div class="diagram-interaction-help"><strong>Interactive view</strong><span>Click the diagram or use Explore diagram.</span><span>Drag or arrow keys to pan.</span><span>Scroll or pinch to zoom.</span><span><kbd>+</kbd> <kbd>-</kbd> zoom</span><span><kbd>0</kbd> reset</span><span><kbd>Esc</kbd> close</span></div>
           <div class="diagram-scroll">
             <svg class="diagram elastic-diagram" viewBox="0 0 1440 960" role="img" aria-labelledby="elastic-title elastic-desc">
               <title id="elastic-title">Elastic deployment of the provider-neutral frontier organization</title>
@@ -798,8 +768,7 @@
               <path d="M312 857H342M572 857H602M832 857H862M1092 857H1122" class="phase-arrow"/>
             </svg>
           </div>
-          <div class="diagram-note">Swipe horizontally to inspect the deployment view at a readable scale.</div>
-          <div class="diagram-assurance"><strong>Deployment and scaling constraints.</strong> Temporal Task Queues retain Workflow and Activity Tasks when Workers are unavailable, and Workers poll only when they have capacity. Temporal Cloud manages the Temporal Service, not the application Workers shown in the execution cells. The elasticity and placement controller is an implementation component that connects Temporal metrics and policy to Kubernetes or cloud autoscalers. The named cloud products are representative implementation options, not required components. A 0-N pool is possible only where the runtime and cold-start objective permit it; maintain a warm minimum for latency-sensitive orchestration, slow-loading models, or privileged access. Activity completions are reported by Workers to the Temporal Service; that return channel is omitted for clarity. Large artifacts remain outside Workflow Event History.</div>
+          <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="elastic-deployment-diagram" data-tooltip="Expand" aria-label="Expand elastic deployment diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
           <div class="legend" aria-label="Elastic deployment diagram legend"><span><i></i>Task scheduling or dispatch</span><span><i class="dashed"></i>Policy dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>Scaling metric</span><span><i style="border-color:#159a9c;border-top-style:dashed"></i>Placement or scale command</span><span><i class="boundary"></i>Execution cell</span></div>
         </figure>
       </div>
@@ -856,24 +825,8 @@
 
   <div class="diagram-viewer" id="diagram-viewer" hidden>
     <div class="viewer-shell" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
-      <div class="viewer-toolbar">
-        <div class="viewer-heading"><span class="viewer-eyebrow">Interactive architecture view</span><span class="viewer-title" id="viewer-title">Architecture diagram</span></div>
-        <div class="viewer-control-group" aria-label="Pan controls">
-          <span class="viewer-control-label">Pan</span>
-          <button class="viewer-button" type="button" data-viewer-action="pan-left" aria-label="Pan left">←</button>
-          <button class="viewer-button" type="button" data-viewer-action="pan-up" aria-label="Pan up">↑</button>
-          <button class="viewer-button" type="button" data-viewer-action="pan-down" aria-label="Pan down">↓</button>
-          <button class="viewer-button" type="button" data-viewer-action="pan-right" aria-label="Pan right">→</button>
-        </div>
-        <div class="viewer-control-group" aria-label="Zoom controls">
-          <span class="viewer-control-label">Zoom</span>
-          <button class="viewer-button" type="button" data-viewer-action="zoom-out" aria-label="Zoom out">−</button>
-          <span class="viewer-zoom-status" id="viewer-zoom-status" aria-live="polite">100%</span>
-          <button class="viewer-button" type="button" data-viewer-action="zoom-in" aria-label="Zoom in">+</button>
-        </div>
-        <button class="viewer-button wide" type="button" data-viewer-action="reset"><span aria-hidden="true">↺</span> Reset</button>
-        <button class="viewer-button wide" type="button" data-viewer-action="close"><span aria-hidden="true">×</span> Close</button>
-      </div>
+      <span class="sr-only" id="viewer-title">Architecture diagram</span>
+      <span class="sr-only" id="viewer-zoom-status" aria-live="polite">100%</span>
       <div class="viewer-stage" id="viewer-stage" aria-label="Interactive diagram. Drag to pan and scroll or pinch to zoom.">
         <div class="viewer-world" id="viewer-world"></div>
       </div>
@@ -884,6 +837,7 @@
         <span><kbd>0</kbd> reset</span>
         <span><kbd>Esc</kbd> close</span>
       </div>
+      <button class="viewer-close icon-button" type="button" data-viewer-action="close" aria-label="Close diagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
     </div>
   </div>
 
@@ -1096,7 +1050,7 @@
       returnFocusTarget = null;
     }
 
-    document.querySelectorAll(".diagram-open").forEach(function (button) {
+    document.querySelectorAll(".diagram-expand").forEach(function (button) {
       button.addEventListener("click", function () {
         var frame = document.getElementById(button.getAttribute("data-diagram-target"));
         openDiagramViewer(frame ? frame.querySelector("svg.diagram") : null, button);
@@ -1106,7 +1060,7 @@
     document.querySelectorAll(".diagram-scroll svg.diagram").forEach(function (diagram) {
       diagram.addEventListener("click", function () {
         var frame = diagram.closest(".diagram-frame");
-        openDiagramViewer(diagram, frame ? frame.querySelector(".diagram-open") : null);
+        openDiagramViewer(diagram, frame ? frame.querySelector(".diagram-expand") : null);
       });
     });
 
