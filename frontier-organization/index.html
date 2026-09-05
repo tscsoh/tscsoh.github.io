@@ -236,8 +236,11 @@
     .viewer-stage { position: relative; min-height: 0; overflow: hidden; background: #fff; cursor: grab; touch-action: none; user-select: none; }
     .viewer-stage.is-dragging { cursor: grabbing; }
     .viewer-stage:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
-    .viewer-world { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; }
-    .viewer-world svg.diagram { display: block; width: 100%; height: 100%; min-width: 0; max-width: none; }
+    .viewer-world { position: absolute; inset: 0; }
+    .viewer-world svg.diagram {
+      display: block; width: 100%; height: 100%; min-width: 0; max-width: none;
+      shape-rendering: geometricPrecision; text-rendering: geometricPrecision;
+    }
     .viewer-help {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 10px 14px;
       border-top: 1px solid var(--line); background: var(--soft); color: #555; font-size: 11px; line-height: 1.55;
@@ -952,50 +955,97 @@
     var activeDiagram = null;
     var diagramPlaceholder = null;
     var returnFocusTarget = null;
-    var viewState = { scale: 1, x: 0, y: 0 };
+    var originalViewBox = null;
+    var originalViewBoxAttribute = "";
+    var viewState = { scale: 1, x: 0, y: 0, width: 0, height: 0 };
     var activePointers = new Map();
     var dragStart = null;
     var pinchStart = null;
 
+    function readDiagramViewBox(diagram) {
+      var values = (diagram.getAttribute("viewBox") || "0 0 1 1").trim().split(/[ ,]+/).map(Number);
+      return { x: values[0], y: values[1], width: values[2], height: values[3] };
+    }
+
     function constrainDiagramView() {
-      var width = viewerStage.clientWidth;
-      var height = viewerStage.clientHeight;
-      var minX = Math.min(0, width - width * viewState.scale);
-      var minY = Math.min(0, height - height * viewState.scale);
-      viewState.x = Math.max(minX, Math.min(0, viewState.x));
-      viewState.y = Math.max(minY, Math.min(0, viewState.y));
+      if (!originalViewBox) return;
+      var maxX = originalViewBox.x + originalViewBox.width - viewState.width;
+      var maxY = originalViewBox.y + originalViewBox.height - viewState.height;
+      viewState.x = Math.max(originalViewBox.x, Math.min(maxX, viewState.x));
+      viewState.y = Math.max(originalViewBox.y, Math.min(maxY, viewState.y));
     }
 
     function renderDiagramView() {
+      if (!activeDiagram || !originalViewBox) return;
       constrainDiagramView();
-      viewerWorld.style.transform = "translate(" + viewState.x + "px," + viewState.y + "px) scale(" + viewState.scale + ")";
+      var values = [viewState.x, viewState.y, viewState.width, viewState.height].map(function (value) {
+        return Math.round(value * 10000) / 10000;
+      });
+      activeDiagram.setAttribute("viewBox", values.join(" "));
       viewerZoomStatus.textContent = Math.round(viewState.scale * 100) + "%";
     }
 
     function resetDiagramView() {
+      if (!originalViewBox) return;
       viewState.scale = 1;
-      viewState.x = 0;
-      viewState.y = 0;
+      viewState.x = originalViewBox.x;
+      viewState.y = originalViewBox.y;
+      viewState.width = originalViewBox.width;
+      viewState.height = originalViewBox.height;
+      renderDiagramView();
+    }
+
+    function screenFraction(clientX, clientY) {
+      var bounds = activeDiagram.getBoundingClientRect();
+      var renderedScale = Math.min(bounds.width / viewState.width, bounds.height / viewState.height);
+      var renderedWidth = viewState.width * renderedScale;
+      var renderedHeight = viewState.height * renderedScale;
+      var left = bounds.left + (bounds.width - renderedWidth) / 2;
+      var top = bounds.top + (bounds.height - renderedHeight) / 2;
+      return {
+        x: Math.max(0, Math.min(1, (clientX - left) / renderedWidth)),
+        y: Math.max(0, Math.min(1, (clientY - top) / renderedHeight))
+      };
+    }
+
+    function diagramPointAt(clientX, clientY) {
+      var fraction = screenFraction(clientX, clientY);
+      return {
+        x: viewState.x + fraction.x * viewState.width,
+        y: viewState.y + fraction.y * viewState.height
+      };
+    }
+
+    function setDiagramScale(nextScale, anchor, clientX, clientY) {
+      nextScale = Math.max(1, Math.min(5, nextScale));
+      var fraction = screenFraction(clientX, clientY);
+      viewState.scale = nextScale;
+      viewState.width = originalViewBox.width / nextScale;
+      viewState.height = originalViewBox.height / nextScale;
+      viewState.x = anchor.x - fraction.x * viewState.width;
+      viewState.y = anchor.y - fraction.y * viewState.height;
       renderDiagramView();
     }
 
     function zoomDiagram(nextScale, clientX, clientY) {
-      var previousScale = viewState.scale;
       nextScale = Math.max(1, Math.min(5, nextScale));
-      if (nextScale === previousScale) return;
-      var bounds = viewerStage.getBoundingClientRect();
-      var pointX = typeof clientX === "number" ? clientX - bounds.left : bounds.width / 2;
-      var pointY = typeof clientY === "number" ? clientY - bounds.top : bounds.height / 2;
-      var ratio = nextScale / previousScale;
-      viewState.x = pointX - (pointX - viewState.x) * ratio;
-      viewState.y = pointY - (pointY - viewState.y) * ratio;
-      viewState.scale = nextScale;
-      renderDiagramView();
+      if (nextScale === viewState.scale) return;
+      var bounds = activeDiagram.getBoundingClientRect();
+      var pointX = typeof clientX === "number" ? clientX : bounds.left + bounds.width / 2;
+      var pointY = typeof clientY === "number" ? clientY : bounds.top + bounds.height / 2;
+      setDiagramScale(nextScale, diagramPointAt(pointX, pointY), pointX, pointY);
+    }
+
+    function diagramUnitsPerPixel() {
+      var bounds = activeDiagram.getBoundingClientRect();
+      var renderedScale = Math.min(bounds.width / viewState.width, bounds.height / viewState.height);
+      return renderedScale ? 1 / renderedScale : 1;
     }
 
     function panDiagram(deltaX, deltaY) {
-      viewState.x += deltaX;
-      viewState.y += deltaY;
+      var unitsPerPixel = diagramUnitsPerPixel();
+      viewState.x += deltaX * unitsPerPixel;
+      viewState.y += deltaY * unitsPerPixel;
       renderDiagramView();
     }
 
@@ -1005,6 +1055,8 @@
       returnFocusTarget = trigger || null;
       var sourceParent = diagram.parentNode;
       var bounds = diagram.getBoundingClientRect();
+      originalViewBoxAttribute = diagram.getAttribute("viewBox") || "0 0 1 1";
+      originalViewBox = readDiagramViewBox(diagram);
       diagramPlaceholder = document.createElement("div");
       diagramPlaceholder.className = "diagram-placeholder";
       diagramPlaceholder.style.height = bounds.height + "px";
@@ -1023,13 +1075,15 @@
 
     function closeDiagramViewer() {
       if (!activeDiagram) return;
+      activeDiagram.setAttribute("viewBox", originalViewBoxAttribute);
       activeDiagram.classList.remove("viewer-svg");
       if (diagramPlaceholder && diagramPlaceholder.parentNode) {
         diagramPlaceholder.parentNode.replaceChild(activeDiagram, diagramPlaceholder);
       }
       activeDiagram = null;
       diagramPlaceholder = null;
-      viewerWorld.style.transform = "";
+      originalViewBox = null;
+      originalViewBoxAttribute = "";
       diagramViewer.hidden = true;
       document.body.classList.remove("diagram-viewer-open");
       activePointers.clear();
@@ -1060,10 +1114,10 @@
         if (action === "reset") resetDiagramView();
         if (action === "zoom-in") zoomDiagram(viewState.scale * 1.25);
         if (action === "zoom-out") zoomDiagram(viewState.scale / 1.25);
-        if (action === "pan-left") panDiagram(70, 0);
-        if (action === "pan-right") panDiagram(-70, 0);
-        if (action === "pan-up") panDiagram(0, 70);
-        if (action === "pan-down") panDiagram(0, -70);
+        if (action === "pan-left") panDiagram(-70, 0);
+        if (action === "pan-right") panDiagram(70, 0);
+        if (action === "pan-up") panDiagram(0, -70);
+        if (action === "pan-down") panDiagram(0, 70);
       });
     });
 
@@ -1081,21 +1135,17 @@
       viewerStage.setPointerCapture(event.pointerId);
       activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (activePointers.size === 1) {
-        dragStart = { pointerX: event.clientX, pointerY: event.clientY, x: viewState.x, y: viewState.y };
+        dragStart = { pointerX: event.clientX, pointerY: event.clientY, x: viewState.x, y: viewState.y, unitsPerPixel: diagramUnitsPerPixel() };
         viewerStage.classList.add("is-dragging");
       }
       if (activePointers.size === 2) {
         var points = Array.from(activePointers.values());
         var centerX = (points[0].x + points[1].x) / 2;
         var centerY = (points[0].y + points[1].y) / 2;
-        var stageBounds = viewerStage.getBoundingClientRect();
         pinchStart = {
           distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y),
           scale: viewState.scale,
-          x: viewState.x,
-          y: viewState.y,
-          centerX: centerX - stageBounds.left,
-          centerY: centerY - stageBounds.top
+          anchor: diagramPointAt(centerX, centerY)
         };
         dragStart = null;
       }
@@ -1108,18 +1158,12 @@
         var points = Array.from(activePointers.values());
         var distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
         var nextScale = Math.max(1, Math.min(5, pinchStart.scale * distance / Math.max(1, pinchStart.distance)));
-        var stageBounds = viewerStage.getBoundingClientRect();
-        var centerX = (points[0].x + points[1].x) / 2 - stageBounds.left;
-        var centerY = (points[0].y + points[1].y) / 2 - stageBounds.top;
-        var contentX = (pinchStart.centerX - pinchStart.x) / pinchStart.scale;
-        var contentY = (pinchStart.centerY - pinchStart.y) / pinchStart.scale;
-        viewState.scale = nextScale;
-        viewState.x = centerX - contentX * nextScale;
-        viewState.y = centerY - contentY * nextScale;
-        renderDiagramView();
+        var centerX = (points[0].x + points[1].x) / 2;
+        var centerY = (points[0].y + points[1].y) / 2;
+        setDiagramScale(nextScale, pinchStart.anchor, centerX, centerY);
       } else if (activePointers.size === 1 && dragStart) {
-        viewState.x = dragStart.x + event.clientX - dragStart.pointerX;
-        viewState.y = dragStart.y + event.clientY - dragStart.pointerY;
+        viewState.x = dragStart.x - (event.clientX - dragStart.pointerX) * dragStart.unitsPerPixel;
+        viewState.y = dragStart.y - (event.clientY - dragStart.pointerY) * dragStart.unitsPerPixel;
         renderDiagramView();
       }
     });
@@ -1128,7 +1172,7 @@
       activePointers.delete(event.pointerId);
       if (activePointers.size === 1) {
         var remaining = Array.from(activePointers.values())[0];
-        dragStart = { pointerX: remaining.x, pointerY: remaining.y, x: viewState.x, y: viewState.y };
+        dragStart = { pointerX: remaining.x, pointerY: remaining.y, x: viewState.x, y: viewState.y, unitsPerPixel: diagramUnitsPerPixel() };
       } else {
         dragStart = null;
       }
@@ -1163,10 +1207,10 @@
         resetDiagramView();
       }
       var step = event.shiftKey ? 120 : 55;
-      if (event.key === "ArrowLeft") { event.preventDefault(); panDiagram(step, 0); }
-      if (event.key === "ArrowRight") { event.preventDefault(); panDiagram(-step, 0); }
-      if (event.key === "ArrowUp") { event.preventDefault(); panDiagram(0, step); }
-      if (event.key === "ArrowDown") { event.preventDefault(); panDiagram(0, -step); }
+      if (event.key === "ArrowLeft") { event.preventDefault(); panDiagram(-step, 0); }
+      if (event.key === "ArrowRight") { event.preventDefault(); panDiagram(step, 0); }
+      if (event.key === "ArrowUp") { event.preventDefault(); panDiagram(0, -step); }
+      if (event.key === "ArrowDown") { event.preventDefault(); panDiagram(0, step); }
       if (event.key === "Tab") {
         var controls = Array.from(diagramViewer.querySelectorAll("button"));
         if (!controls.length) return;
