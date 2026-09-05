@@ -62,10 +62,12 @@
       background: var(--soft); color: #444; font: 700 10px/1.5 "Verlag", "Helvetica Neue", Arial, sans-serif; text-align: center;
     }
     .diagram-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
-    .diagram-scroll svg { display: block; width: 100%; min-width: 1120px; height: auto; }
+    .diagram-canvas { position: relative; min-width: 1120px; }
+    .diagram-scroll svg { display: block; width: 100%; height: auto; }
     .diagram-scroll svg.diagram { cursor: zoom-in; }
     .diagram-placeholder { width: 100%; background: var(--soft); }
-    .diagram-actions { display: flex; justify-content: flex-end; min-height: 54px; padding: 8px 12px; border-top: 1px solid var(--line); background: #fff; }
+    .diagram-actions { position: absolute; right: 12px; bottom: 12px; z-index: 5; pointer-events: none; }
+    .diagram-actions .diagram-expand { background: rgba(255,255,255,.82); backdrop-filter: blur(2px); pointer-events: auto; }
     .icon-button {
       position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0;
       border: 1px solid #777; background: #fff; color: var(--ink); cursor: pointer; font: inherit;
@@ -105,7 +107,7 @@
     .diagram .node-card { fill: #fff; stroke: #999; stroke-width: 1.2; }
     .diagram .node-card.primary { stroke: var(--gold-dark); stroke-width: 1.6; }
     .diagram .icon-tile { stroke: none; }
-    .diagram .icon-line { fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .diagram .icon-line { fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
     .diagram .node-type { fill: #888; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
     .diagram .node-name { fill: #242424; font-size: 15px; font-weight: 700; }
     .diagram .node-detail { fill: #6f6f6f; font-size: 10.5px; }
@@ -295,6 +297,7 @@
             <span class="diagram-meta">Logical component + runtime flow · v1.2 · reviewed 5 September 2026</span>
           </figcaption>
           <div class="diagram-scroll">
+            <div class="diagram-canvas">
             <svg class="diagram" viewBox="0 0 1440 900" role="img" aria-labelledby="diagram-title diagram-desc">
               <title id="diagram-title">Provider-neutral frontier model organization reference architecture</title>
               <desc id="diagram-desc">Human objectives and automated events start a Temporal workflow. A LangGraph application graph registered on a Temporal Worker can dynamically assign specialist worker nodes. Model calls pass through LiteLLM and tool calls through an MCP host. Temporal owns workflow history; application state, artifacts, and telemetry use separate stores and pipelines. A custom completion gate can return an evidence package, await an approval signal, or route work back for revision.</desc>
@@ -523,8 +526,9 @@
               <g class="zone-heading"><rect x="935" y="581" width="92" height="25" rx="3" class="zone-label-bg"/><text x="944" y="599" class="zone-label">TOOL PLANE</text></g>
               <g class="zone-heading"><rect x="255" y="661" width="190" height="25" rx="3" class="zone-label-bg"/><text x="264" y="679" class="zone-label">STATE + EVIDENCE PLANE</text></g>
             </svg>
+            <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="architecture-diagram" data-tooltip="Expand" aria-label="Expand architecture diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
+            </div>
           </div>
-          <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="architecture-diagram" data-tooltip="Expand" aria-label="Expand architecture diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
           <div class="legend" aria-label="Diagram legend"><span><i></i>Runtime request or transition</span><span><i class="dashed"></i>Policy or control dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>State, evidence, or telemetry export</span><span><i style="border-color:#159a9c"></i>External integration request</span><span><i style="border-color:#b54f77"></i>Approval signal</span><span><i class="boundary"></i>Logical scope</span><span><i class="external-boundary"></i>External service boundary</span></div>
         </figure>
       </div>
@@ -543,6 +547,7 @@
             <span class="diagram-meta">Deployment + dynamic view · v1.0 · reviewed 5 September 2026</span>
           </figcaption>
           <div class="diagram-scroll">
+            <div class="diagram-canvas">
             <svg class="diagram elastic-diagram" viewBox="0 0 1440 960" role="img" aria-labelledby="elastic-title elastic-desc">
               <title id="elastic-title">Elastic deployment of the provider-neutral frontier organization</title>
               <desc id="elastic-desc">The durable organization control plane stays available while LangGraph schedules specialist Activities onto Temporal Task Queues. A custom elasticity and placement controller observes backlog, latency, cost, quota, residency, and cold-start policy. Eligible Activity Worker pools and their model or tool capacity can scale across on-premises, AWS, Azure, and Google Cloud execution cells. After completion, workers drain and return to zero or a configured warm minimum.</desc>
@@ -767,8 +772,9 @@
               <g><rect x="1122" y="833" width="230" height="48" rx="3" class="phase"/><text x="1135" y="852" class="phase-title">5 · DRAIN</text><text x="1135" y="871" class="phase-detail">cooldown · return to 0/min</text></g>
               <path d="M312 857H342M572 857H602M832 857H862M1092 857H1122" class="phase-arrow"/>
             </svg>
+            <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="elastic-deployment-diagram" data-tooltip="Expand" aria-label="Expand elastic deployment diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
+            </div>
           </div>
-          <div class="diagram-actions"><button class="diagram-expand icon-button" type="button" data-diagram-target="elastic-deployment-diagram" data-tooltip="Expand" aria-label="Expand elastic deployment diagram" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
           <div class="legend" aria-label="Elastic deployment diagram legend"><span><i></i>Task scheduling or dispatch</span><span><i class="dashed"></i>Policy dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>Scaling metric</span><span><i style="border-color:#159a9c;border-top-style:dashed"></i>Placement or scale command</span><span><i class="boundary"></i>Execution cell</span></div>
         </figure>
       </div>
