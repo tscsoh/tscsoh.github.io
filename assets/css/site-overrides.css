@@ -27,6 +27,35 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   text-decoration: none;
 }
 
+/* ---- frontier organization reference link -------------------
+   A restrained editorial handoff from the home-page process view
+   to the deeper provider-neutral architecture case study. */
+.frontier-architecture-link {
+  margin: 30px auto 8px;
+  text-align: center;
+}
+.frontier-architecture-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 8px;
+  border-bottom: 1px solid #c5a47e;
+  color: #6f573d;
+  font-family: "Verlag-Book", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.11em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.frontier-architecture-link a:hover,
+.frontier-architecture-link a:focus {
+  color: #242424;
+  gap: 17px;
+  text-decoration: none;
+}
+
 /* ---- hero portrait ------------------------------------------
    Crop/darken the hero photo to match the previous photo's
    moody, tightly-cropped treatment. */

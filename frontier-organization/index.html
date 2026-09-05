@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A reference architecture for a provider-neutral organization of frontier AI models.">
+  <link rel="canonical" href="https://toddswepston.com/frontier-organization/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Frontier Organization Architecture — Todd Swepston">
+  <meta property="og:description" content="A durable, governed architecture for recruiting and coordinating agents across frontier model providers.">
+  <title>Frontier Organization Architecture — Todd Swepston</title>
+  <style>
+    @font-face { font-family: "Slim Joe"; src: url("https://toddswepston.com/assets/fonts/Slim-Joe/Slim-Joe.woff") format("woff"); font-display: swap; }
+    @font-face { font-family: "Verlag"; src: url("https://toddswepston.com/assets/fonts/Verlag-Book/Verlag-Book.woff") format("woff"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Verlag"; src: url("https://toddswepston.com/assets/fonts/Verlag-Book/Verlag-Bold.woff") format("woff"); font-weight: 700; font-display: swap; }
+    :root {
+      --ink: #242424; --muted: #777; --line: #d9d9d9; --soft: #f7f7f5;
+      --paper: #fff; --night: #08090b; --gold: #c5a47e; --gold-dark: #8c6d49;
+      --teal: #159a9c; --blue: #3c78a8; --plum: #73549d; --rose: #b54f77;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: "Verlag", "Helvetica Neue", Arial, sans-serif; }
+    a { color: inherit; }
+    .site-nav {
+      position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
+      min-height: 68px; padding: 0 clamp(20px, 5vw, 72px); background: rgba(8, 9, 11, .94);
+      color: #fff; border-bottom: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(14px);
+    }
+    .brand { font-family: "Slim Joe", "Helvetica Neue", sans-serif; font-size: 19px; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+    .site-nav nav { display: flex; gap: clamp(16px, 2.5vw, 34px); }
+    .site-nav nav a { color: rgba(255,255,255,.72); font-size: 12px; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
+    .site-nav nav a:hover { color: var(--gold); }
+    .hero { color: #fff; background: var(--night); padding: clamp(82px, 12vw, 154px) max(5vw, 24px) clamp(72px, 10vw, 126px); }
+    .hero-inner, .content { width: min(1240px, 100%); margin: 0 auto; }
+    .eyebrow, .section-label { color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { max-width: 1000px; margin: 22px 0 28px; font-family: "Slim Joe", "Helvetica Neue", sans-serif; font-size: clamp(48px, 7.6vw, 104px); font-weight: 400; letter-spacing: -.025em; line-height: .96; text-transform: uppercase; }
+    .hero p { max-width: 760px; margin: 0; color: rgba(255,255,255,.72); font-size: clamp(17px, 1.8vw, 22px); line-height: 1.65; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; }
+    .hero-meta span { padding: 8px 11px; border: 1px solid rgba(197,164,126,.55); color: rgba(255,255,255,.82); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    section { padding: clamp(68px, 8vw, 108px) max(5vw, 24px); }
+    section + section { border-top: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 440px); gap: 40px; align-items: end; margin-bottom: 34px; }
+    h2 { margin: 10px 0 0; font-family: "Slim Joe", "Helvetica Neue", sans-serif; font-size: clamp(34px, 4.8vw, 62px); font-weight: 400; letter-spacing: -.02em; line-height: 1.02; text-transform: uppercase; }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .diagram-frame { border: 1px solid #bdbdbd; background: #fff; box-shadow: 0 18px 48px rgba(0,0,0,.08); }
+    .diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--line); background: var(--soft); }
+    .diagram-id { font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    .diagram-meta { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .diagram-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+    .diagram-scroll svg { display: block; width: 100%; min-width: 1120px; height: auto; }
+    .diagram-note { display: none; padding: 9px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; text-align: center; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px 28px; padding: 15px 18px; border-top: 1px solid var(--line); color: #666; font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .legend i { display: inline-block; width: 28px; border-top: 2px solid #555; }
+    .legend .dashed { border-top-style: dashed; border-color: var(--gold-dark); }
+    .legend .boundary { width: 18px; height: 12px; border: 1.5px dashed var(--gold-dark); }
+    .diagram text { font-family: "Verlag", "Helvetica Neue", Arial, sans-serif; }
+    .diagram .outer-boundary { fill: #fff; stroke: var(--gold-dark); stroke-width: 1.6; stroke-dasharray: 7 5; }
+    .diagram .zone { stroke: #cecece; stroke-width: 1.15; }
+    .diagram .zone.control { fill: #faf7f2; }
+    .diagram .zone.runtime { fill: #f7f9fa; }
+    .diagram .zone.model { fill: #f3f8fa; }
+    .diagram .zone.tool { fill: #faf6f8; }
+    .diagram .zone.evidence { fill: #f8f7fa; }
+    .diagram .boundary-label { fill: var(--gold-dark); font-size: 12px; font-weight: 700; letter-spacing: 1.4px; }
+    .diagram .zone-label { fill: #555; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; }
+    .diagram .node-card { fill: #fff; stroke: #999; stroke-width: 1.2; }
+    .diagram .node-card.primary { stroke: var(--gold-dark); stroke-width: 1.6; }
+    .diagram .icon-tile { stroke: none; }
+    .diagram .icon-line { fill: none; stroke: #fff; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+    .diagram .node-type { fill: #888; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+    .diagram .node-name { fill: #242424; font-size: 15px; font-weight: 700; }
+    .diagram .node-detail { fill: #6f6f6f; font-size: 10.5px; }
+    .diagram .mini-name { fill: #333; font-size: 11px; font-weight: 700; text-anchor: middle; }
+    .diagram .mini-detail { fill: #777; font-size: 9px; text-anchor: middle; }
+    .diagram .flow { fill: none; stroke: #454545; stroke-width: 1.7; marker-end: url(#arrow); }
+    .diagram .policy { fill: none; stroke: var(--gold-dark); stroke-width: 1.4; stroke-dasharray: 6 5; marker-end: url(#arrow-gold); }
+    .diagram .telemetry { fill: none; stroke: #796b87; stroke-width: 1.25; stroke-dasharray: 3 4; marker-end: url(#arrow-plum); }
+    .diagram .label-bg { fill: #fff; stroke: #ddd; stroke-width: .8; }
+    .diagram .edge-text { fill: #555; font-size: 9.5px; font-weight: 700; letter-spacing: .4px; }
+    .diagram .step { fill: #222; }
+    .diagram .step-text { fill: #fff; font-size: 9px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+    .diagram .external-card { fill: #fff; stroke: #777; stroke-width: 1.2; }
+    .diagram .external-label { fill: #666; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    .diagram .gate { fill: #242424; }
+    .diagram .gate-title { fill: #fff; font-size: 12px; font-weight: 700; text-anchor: middle; }
+    .diagram .gate-detail { fill: #d8d8d8; font-size: 9px; text-anchor: middle; }
+    .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
+    .detail { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 27px 28px 27px 0; border-bottom: 1px solid var(--line); }
+    .detail:nth-child(odd) { border-right: 1px solid var(--line); }
+    .detail:nth-child(even) { padding-left: 28px; }
+    .detail > span { color: var(--gold-dark); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+    .detail h3 { margin: 0 0 8px; font-size: 18px; }
+    .detail p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .references { border-top: 1px solid var(--line); }
+    .reference { display: grid; grid-template-columns: 118px 190px 1fr 130px; gap: 22px; align-items: center; padding: 19px 0; border-bottom: 1px solid var(--line); }
+    .reference > * { margin: 0; }
+    .reference .status { color: var(--gold-dark); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .reference h3 { font-size: 15px; }
+    .reference p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .reference a { color: var(--gold-dark); font-size: 12px; font-weight: 700; text-align: right; text-decoration: none; }
+    .reference a:hover { text-decoration: underline; }
+    .method-note { display: grid; grid-template-columns: minmax(220px,.7fr) 1.4fr; gap: 34px; margin-top: 34px; padding: 28px; background: var(--night); color: #fff; }
+    .method-note h3 { margin: 8px 0 0; font-size: 24px; }
+    .method-note p { margin: 0; color: rgba(255,255,255,.7); line-height: 1.7; }
+    .method-note a { color: var(--gold); }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px max(5vw,24px); border-top: 1px solid #252525; color: rgba(255,255,255,.55); background: var(--night); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+    @media (max-width: 800px) {
+      .section-head { grid-template-columns: 1fr; gap: 15px; }
+      .details-grid { grid-template-columns: 1fr; }
+      .detail, .detail:nth-child(even) { padding: 22px 0; border-right: 0; }
+      .reference { grid-template-columns: 105px 155px 1fr; }
+      .reference a { grid-column: 3; text-align: left; }
+      .method-note { grid-template-columns: 1fr; gap: 18px; }
+      .diagram-note { display: block; }
+    }
+    @media (max-width: 600px) {
+      .site-nav { min-height: 60px; }
+      .site-nav nav a:not(:first-child) { display: none; }
+      .brand { font-size: 15px; }
+      .hero { padding-top: 70px; }
+      .reference { grid-template-columns: 1fr; gap: 7px; }
+      .reference a { grid-column: 1; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="site-nav">
+    <a class="brand" href="https://toddswepston.com/">Todd Swepston</a>
+    <nav aria-label="Page navigation"><a href="#architecture">Architecture</a><a href="#operating-model">Operating model</a><a href="#validation">Validation</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <span class="eyebrow">Reference architecture · AI platform engineering</span>
+        <h1>One organization.<br>Many frontier models.</h1>
+        <p>A provider-neutral operating model for assembling specialist agents on demand—durable across failures, governed at every boundary, and evaluated against evidence rather than consensus.</p>
+        <div class="hero-meta"><span>Portable roles</span><span>Dynamic recruitment</span><span>Durable execution</span><span>Isolated writers</span></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="content">
+        <div class="section-head">
+          <div><span class="section-label">Architecture view 01</span><h2>System containers and execution flow</h2></div>
+          <p>This view separates organization policy, durable orchestration, model access, governed tools, and evidence. Solid arrows are runtime calls; dashed arrows are policy or telemetry paths.</p>
+        </div>
+
+        <figure class="diagram-frame">
+          <figcaption class="diagram-toolbar">
+            <span class="diagram-id">Provider-neutral synthetic organization</span>
+            <span class="diagram-meta">Container + dynamic view · v1.0 · September 2026</span>
+          </figcaption>
+          <div class="diagram-scroll">
+            <svg class="diagram" viewBox="0 0 1440 900" role="img" aria-labelledby="diagram-title diagram-desc">
+              <title id="diagram-title">Provider-neutral frontier model organization reference architecture</title>
+              <desc id="diagram-desc">Human objectives and automated events enter a durable Temporal workflow. LangGraph recruits a team of specialist agents from a portable organization specification. Agents invoke frontier models through LiteLLM and tools through an MCP host. State, artifacts, audit events, and telemetry are recorded. A completion gate either returns an evidence package, pauses for human approval, or loops back for revision.</desc>
+              <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#454545"/></marker>
+                <marker id="arrow-gold" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#8c6d49"/></marker>
+                <marker id="arrow-plum" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#796b87"/></marker>
+              </defs>
+
+              <rect x="215" y="54" width="1195" height="802" rx="3" class="outer-boundary"/>
+              <text x="238" y="82" class="boundary-label">PROVIDER-NEUTRAL SYNTHETIC ORGANIZATION</text>
+
+              <rect x="245" y="105" width="1135" height="145" class="zone control"/>
+              <text x="264" y="129" class="zone-label">DEFINITION + GOVERNANCE PLANE</text>
+
+              <rect x="245" y="282" width="650" height="348" class="zone runtime"/>
+              <text x="264" y="306" class="zone-label">DURABLE ORCHESTRATION PLANE</text>
+
+              <rect x="925" y="282" width="455" height="270" class="zone model"/>
+              <text x="944" y="306" class="zone-label">MODEL PLANE</text>
+
+              <rect x="925" y="575" width="455" height="235" class="zone tool"/>
+              <text x="944" y="599" class="zone-label">TOOL PLANE</text>
+
+              <rect x="245" y="655" width="650" height="155" class="zone evidence"/>
+              <text x="264" y="679" class="zone-label">STATE + EVIDENCE PLANE</text>
+
+              <!-- external actors and event sources -->
+              <text x="30" y="112" class="external-label">EXTERNAL ACTORS</text>
+              <g>
+                <rect x="30" y="132" width="150" height="118" rx="2" class="external-card"/>
+                <circle cx="105" cy="166" r="14" fill="none" stroke="#444" stroke-width="2"/>
+                <path d="M77 220c2-24 14-35 28-35s26 11 28 35M62 215c2-17 10-25 21-27M148 215c-2-17-10-25-21-27" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"/>
+                <text x="105" y="234" class="mini-name">Human sponsor</text>
+              </g>
+              <g>
+                <rect x="30" y="287" width="150" height="154" rx="2" class="external-card"/>
+                <rect x="51" y="312" width="108" height="38" rx="2" fill="#f5f5f5" stroke="#bbb"/>
+                <text x="105" y="335" class="mini-name">API request</text>
+                <rect x="51" y="359" width="108" height="38" rx="2" fill="#f5f5f5" stroke="#bbb"/>
+                <text x="105" y="382" class="mini-name">Schedule</text>
+                <rect x="51" y="406" width="108" height="22" rx="2" fill="#f5f5f5" stroke="#bbb"/>
+                <text x="105" y="421" class="mini-detail">Repository event</text>
+                <text x="105" y="463" class="external-label" text-anchor="middle">EVENT SOURCES</text>
+              </g>
+              <g>
+                <rect x="30" y="682" width="150" height="94" rx="2" class="external-card"/>
+                <rect x="68" y="700" width="74" height="30" rx="15" fill="#242424"/>
+                <text x="105" y="720" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">Complete</text>
+                <text x="105" y="749" class="mini-name">Evidence package</text>
+                <text x="105" y="765" class="mini-detail">decision + artifacts</text>
+              </g>
+
+              <!-- governance nodes -->
+              <g>
+                <rect x="270" y="150" width="230" height="76" rx="3" class="node-card primary"/>
+                <rect x="270" y="150" width="54" height="76" fill="#8c6d49"/>
+                <path d="M285 168h24v38h-24zM290 176h14M290 183h14M290 190h10" class="icon-line"/>
+                <text x="340" y="171" class="node-type">PORTABLE DEFINITION</text>
+                <text x="340" y="193" class="node-name">Organization spec</text>
+                <text x="340" y="211" class="node-detail">roles · authority · recruitment</text>
+              </g>
+              <g>
+                <rect x="545" y="150" width="220" height="76" rx="3" class="node-card"/>
+                <rect x="545" y="150" width="54" height="76" fill="#73549d"/>
+                <path d="M563 177l9-7 9 7v12c0 9-9 16-9 16s-9-7-9-16zM568 188l4 4 7-9" class="icon-line"/>
+                <text x="615" y="171" class="node-type">CONTROL</text>
+                <text x="615" y="193" class="node-name">Secrets + policy</text>
+                <text x="615" y="211" class="node-detail">identity · permissions · risk</text>
+              </g>
+              <g>
+                <rect x="810" y="150" width="220" height="76" rx="3" class="node-card"/>
+                <rect x="810" y="150" width="54" height="76" fill="#b54f77"/>
+                <circle cx="837" cy="175" r="8" class="icon-line"/><path d="M823 205c1-13 6-20 14-20s13 7 14 20M846 180l8-8M851 172h5v5" class="icon-line"/>
+                <text x="880" y="171" class="node-type">HUMAN CONTROL</text>
+                <text x="880" y="193" class="node-name">Approval authority</text>
+                <text x="880" y="211" class="node-detail">risk review · escalation</text>
+              </g>
+              <g>
+                <rect x="1075" y="150" width="275" height="76" rx="3" class="node-card"/>
+                <rect x="1075" y="150" width="54" height="76" fill="#159a9c"/>
+                <path d="M1092 173h20v28h-20zM1097 168h10v7M1097 181h10M1097 188h10M1097 195h7" class="icon-line"/>
+                <text x="1145" y="171" class="node-type">ROUTING POLICY</text>
+                <text x="1145" y="193" class="node-name">Capability registry</text>
+                <text x="1145" y="211" class="node-detail">model strengths · limits · cost</text>
+              </g>
+
+              <!-- runtime nodes -->
+              <g>
+                <rect x="280" y="360" width="175" height="120" rx="3" class="node-card"/>
+                <rect x="334" y="330" width="68" height="58" rx="2" fill="#73549d"/>
+                <circle cx="368" cy="359" r="17" class="icon-line"/><path d="M368 359V348M368 359l9 7" class="icon-line"/>
+                <text x="368" y="414" class="node-type" text-anchor="middle">WORKFLOW ENGINE</text>
+                <text x="368" y="438" class="node-name" text-anchor="middle">Temporal</text>
+                <text x="368" y="458" class="node-detail" text-anchor="middle">history · retry · wait · signal</text>
+              </g>
+              <g>
+                <rect x="500" y="360" width="180" height="120" rx="3" class="node-card primary"/>
+                <rect x="556" y="330" width="68" height="58" rx="2" fill="#8c6d49"/>
+                <circle cx="573" cy="350" r="5" fill="#fff"/><circle cx="607" cy="350" r="5" fill="#fff"/><circle cx="590" cy="373" r="5" fill="#fff"/>
+                <path d="M577 353l10 15M603 353l-10 15M578 350h24" class="icon-line"/>
+                <text x="590" y="414" class="node-type" text-anchor="middle">COGNITIVE ORCHESTRATOR</text>
+                <text x="590" y="438" class="node-name" text-anchor="middle">LangGraph</text>
+                <text x="590" y="458" class="node-detail" text-anchor="middle">plan · route · merge · adjudicate</text>
+              </g>
+              <g>
+                <rect x="725" y="330" width="145" height="222" rx="3" class="node-card"/>
+                <text x="797.5" y="356" class="node-type" text-anchor="middle">RECRUITED TEAM</text>
+                <text x="797.5" y="378" class="node-name" text-anchor="middle">Agent swarm</text>
+                <g>
+                  <rect x="742" y="396" width="50" height="58" rx="2" fill="#159a9c"/><circle cx="767" cy="413" r="7" class="icon-line"/><path d="M754 440c1-11 6-17 13-17s12 6 13 17" class="icon-line"/><text x="767" y="468" class="mini-detail">Architect</text>
+                  <rect x="806" y="396" width="50" height="58" rx="2" fill="#3c78a8"/><path d="M819 412h24v22h-24zM823 408h16v4M825 419h12M825 425h8" class="icon-line"/><text x="831" y="468" class="mini-detail">Research</text>
+                  <rect x="742" y="484" width="50" height="48" rx="2" fill="#b54f77"/><path d="M756 496h22v22h-22zM761 501l12 12M773 501l-12 12" class="icon-line"/><text x="767" y="545" class="mini-detail">Builder</text>
+                  <rect x="806" y="484" width="50" height="48" rx="2" fill="#73549d"/><path d="M818 501l7 7 17-17M817 518h26" class="icon-line"/><text x="831" y="545" class="mini-detail">Critic</text>
+                </g>
+              </g>
+              <g>
+                <rect x="493" y="535" width="194" height="68" rx="34" class="gate"/>
+                <text x="590" y="562" class="gate-title">COMPLETION GATE</text>
+                <text x="590" y="582" class="gate-detail">tests · policy · evidence · confidence</text>
+              </g>
+
+              <!-- model plane -->
+              <g>
+                <rect x="955" y="348" width="132" height="124" rx="3" class="node-card primary"/>
+                <rect x="987" y="326" width="68" height="58" rx="2" fill="#159a9c"/>
+                <path d="M1000 356h42M1034 348l8 8-8 8M1008 348l-8 8 8 8" class="icon-line"/>
+                <text x="1021" y="409" class="node-type" text-anchor="middle">MODEL GATEWAY</text>
+                <text x="1021" y="433" class="node-name" text-anchor="middle">LiteLLM</text>
+                <text x="1021" y="452" class="node-detail" text-anchor="middle">route · fallback · account</text>
+              </g>
+              <g>
+                <rect x="1130" y="330" width="105" height="86" rx="2" class="node-card"/>
+                <rect x="1157" y="345" width="51" height="38" rx="2" fill="#222"/><text x="1182.5" y="369" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">OAI</text>
+                <text x="1182.5" y="400" class="mini-name">OpenAI</text>
+                <rect x="1250" y="330" width="105" height="86" rx="2" class="node-card"/>
+                <rect x="1277" y="345" width="51" height="38" rx="2" fill="#8c6d49"/><text x="1302.5" y="369" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">A</text>
+                <text x="1302.5" y="400" class="mini-name">Anthropic</text>
+                <rect x="1130" y="436" width="105" height="86" rx="2" class="node-card"/>
+                <rect x="1157" y="451" width="51" height="38" rx="2" fill="#3c78a8"/><text x="1182.5" y="475" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">G</text>
+                <text x="1182.5" y="506" class="mini-name">Google</text>
+                <rect x="1250" y="436" width="105" height="86" rx="2" class="node-card"/>
+                <rect x="1277" y="451" width="51" height="38" rx="2" fill="#73549d"/><text x="1302.5" y="475" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">LOCAL</text>
+                <text x="1302.5" y="506" class="mini-name">Other / local</text>
+              </g>
+
+              <!-- tool plane -->
+              <g>
+                <rect x="955" y="635" width="132" height="124" rx="3" class="node-card primary"/>
+                <rect x="987" y="613" width="68" height="58" rx="2" fill="#b54f77"/>
+                <path d="M1004 635v14M1038 635v14M1004 642h34M1012 649v8h18v-8" class="icon-line"/>
+                <text x="1021" y="696" class="node-type" text-anchor="middle">TOOL GATEWAY</text>
+                <text x="1021" y="720" class="node-name" text-anchor="middle">MCP host</text>
+                <text x="1021" y="739" class="node-detail" text-anchor="middle">authorize · isolate · audit</text>
+              </g>
+              <g>
+                <rect x="1130" y="618" width="105" height="74" rx="2" class="node-card"/><rect x="1161" y="630" width="43" height="30" rx="2" fill="#555"/><text x="1182.5" y="650" fill="#fff" font-size="11" font-weight="700" text-anchor="middle">GIT</text><text x="1182.5" y="678" class="mini-name">Worktrees</text>
+                <rect x="1250" y="618" width="105" height="74" rx="2" class="node-card"/><ellipse cx="1302.5" cy="639" rx="20" ry="7" fill="none" stroke="#3c78a8" stroke-width="2"/><path d="M1282.5 639v16c0 4 9 7 20 7s20-3 20-7v-16" fill="none" stroke="#3c78a8" stroke-width="2"/><text x="1302.5" y="678" class="mini-name">Data + SaaS</text>
+                <rect x="1130" y="711" width="105" height="74" rx="2" class="node-card"/><circle cx="1182.5" cy="736" r="16" fill="none" stroke="#159a9c" stroke-width="2"/><path d="M1166.5 736h32M1182.5 720c8 8 8 24 0 32M1182.5 720c-8 8-8 24 0 32" fill="none" stroke="#159a9c" stroke-width="1.5"/><text x="1182.5" y="772" class="mini-name">Browser</text>
+                <rect x="1250" y="711" width="105" height="74" rx="2" class="node-card"/><rect x="1281" y="722" width="43" height="30" rx="2" fill="#242424"/><path d="M1289 732l7 5-7 5M1301 743h12" class="icon-line"/><text x="1302.5" y="772" class="mini-name">Shell</text>
+              </g>
+
+              <!-- evidence plane -->
+              <g>
+                <rect x="272" y="706" width="130" height="76" rx="2" class="node-card"/><ellipse cx="337" cy="725" rx="18" ry="6" fill="none" stroke="#73549d" stroke-width="2"/><path d="M319 725v18c0 4 8 6 18 6s18-2 18-6v-18" fill="none" stroke="#73549d" stroke-width="2"/><text x="337" y="768" class="mini-name">Temporal history</text>
+                <rect x="420" y="706" width="130" height="76" rx="2" class="node-card"/><ellipse cx="485" cy="725" rx="18" ry="6" fill="none" stroke="#3c78a8" stroke-width="2"/><path d="M467 725v18c0 4 8 6 18 6s18-2 18-6v-18" fill="none" stroke="#3c78a8" stroke-width="2"/><text x="485" y="768" class="mini-name">PostgreSQL</text>
+                <rect x="568" y="706" width="130" height="76" rx="2" class="node-card"/><path d="M608 721h50v31h-50zM613 716h18l5 5" fill="none" stroke="#b54f77" stroke-width="2"/><text x="633" y="768" class="mini-name">Artifact store</text>
+                <rect x="716" y="706" width="150" height="76" rx="2" class="node-card"/><path d="M755 744l12-12 11 7 19-20M755 751h48" fill="none" stroke="#159a9c" stroke-width="2"/><text x="791" y="768" class="mini-name">OpenTelemetry</text>
+              </g>
+
+              <!-- runtime flows, routed in reserved gutters -->
+              <path d="M180 191H220V400H280" class="flow"/>
+              <g><rect x="193" y="270" width="84" height="25" rx="12.5" class="label-bg"/><circle cx="208" cy="282.5" r="9" class="step"/><text x="208" y="283" class="step-text">1</text><text x="222" y="286" class="edge-text">OBJECTIVE</text></g>
+              <path d="M180 365H230V440H280" class="flow"/>
+              <g><rect x="190" y="385" width="88" height="25" rx="12.5" class="label-bg"/><circle cx="205" cy="397.5" r="9" class="step"/><text x="205" y="398" class="step-text">2</text><text x="219" y="401" class="edge-text">TRIGGER</text></g>
+              <path d="M455 420H500" class="flow"/>
+              <g><rect x="448" y="391" width="62" height="24" rx="12" class="label-bg"/><circle cx="463" cy="403" r="8" class="step"/><text x="463" y="404" class="step-text">3</text><text x="476" y="406" class="edge-text">TASK</text></g>
+              <path d="M680 420H725" class="flow"/>
+              <g><rect x="665" y="391" width="70" height="24" rx="12" class="label-bg"/><circle cx="680" cy="403" r="8" class="step"/><text x="680" y="404" class="step-text">4</text><text x="693" y="406" class="edge-text">RECRUIT</text></g>
+              <path d="M870 403H925V410H955" class="flow"/>
+              <g><rect x="878" y="370" width="82" height="25" rx="12.5" class="label-bg"/><circle cx="893" cy="382.5" r="9" class="step"/><text x="893" y="383" class="step-text">5</text><text x="907" y="386" class="edge-text">INVOKE</text></g>
+              <path d="M1087 410H1110V373H1130M1110 373V479H1130M1110 373H1250M1110 479H1250" class="flow"/>
+              <path d="M870 500H902V697H955" class="flow"/>
+              <g><rect x="876" y="648" width="94" height="25" rx="12.5" class="label-bg"/><circle cx="891" cy="660.5" r="9" class="step"/><text x="891" y="661" class="step-text">6</text><text x="905" y="664" class="edge-text">MCP CALL</text></g>
+              <path d="M1087 697H1110V655H1130M1110 655V748H1130M1110 655H1250M1110 748H1250" class="flow"/>
+              <path d="M797 552V569H687" class="flow"/>
+              <g><rect x="697" y="553" width="83" height="25" rx="12.5" class="label-bg"/><circle cx="712" cy="565.5" r="9" class="step"/><text x="712" y="566" class="step-text">7</text><text x="726" y="569" class="edge-text">EVALUATE</text></g>
+              <path d="M493 569H465V510H590V480" class="policy"/>
+              <g><rect x="468" y="497" width="82" height="24" rx="12" class="label-bg"/><text x="479" y="512" class="edge-text">FAIL · REVISE</text></g>
+              <path d="M493 582H222V729H180" class="flow"/>
+              <g><rect x="238" y="706" width="106" height="25" rx="12.5" class="label-bg"/><circle cx="253" cy="718.5" r="9" class="step"/><text x="253" y="719" class="step-text">8</text><text x="267" y="722" class="edge-text">RETURN RESULT</text></g>
+
+              <!-- governance and evidence paths -->
+              <path d="M385 226V262H590V330" class="policy"/>
+              <g><rect x="429" y="250" width="104" height="23" rx="11.5" class="label-bg"/><text x="441" y="265" class="edge-text">ROLE CONTRACTS</text></g>
+              <path d="M655 226V268H368V330" class="policy"/>
+              <path d="M920 226V268H590V535" class="policy"/>
+              <g><rect x="778" y="256" width="94" height="23" rx="11.5" class="label-bg"/><text x="790" y="271" class="edge-text">APPROVAL RULES</text></g>
+              <path d="M1212 226V260H1021V326" class="policy"/>
+              <g><rect x="1082" y="249" width="98" height="23" rx="11.5" class="label-bg"/><text x="1094" y="264" class="edge-text">ROUTING POLICY</text></g>
+              <path d="M368 480V640H337V706" class="telemetry"/>
+              <path d="M590 480V640H485V706" class="telemetry"/>
+              <path d="M797 552V640H633V706" class="telemetry"/>
+              <path d="M870 533H885V640H791V706" class="telemetry"/>
+            </svg>
+          </div>
+          <div class="diagram-note">Swipe horizontally to inspect the architecture at a readable scale.</div>
+          <div class="legend" aria-label="Diagram legend"><span><i></i>Runtime request or result</span><span><i class="dashed"></i>Policy or control dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>State, evidence, or telemetry</span><span><i class="boundary"></i>System responsibility boundary</span></div>
+        </figure>
+      </div>
+    </section>
+
+    <section id="operating-model">
+      <div class="content">
+        <div class="section-head"><div><span class="section-label">Operating model</span><h2>Persistent definitions. Ephemeral teams.</h2></div><p>The organization exists as versioned policy and contracts. Agent instances are recruited for the objective, operate inside explicit authority, and dissolve when the evidence gate passes.</p></div>
+        <div class="details-grid">
+          <article class="detail"><span>01</span><div><h3>Portable organization</h3><p>YAML or TOML defines roles, authority, model policy, recruitment rules, budgets, and typed work contracts. The definition belongs to you—not to an agent vendor.</p></div></article>
+          <article class="detail"><span>02</span><div><h3>Durable process</h3><p>Temporal owns workflow history, timers, retries, signals, approvals, task queues, and recovery across worker crashes or long human decisions.</p></div></article>
+          <article class="detail"><span>03</span><div><h3>Cognitive orchestration</h3><p>LangGraph decomposes objectives, recruits roles, fans work into subgraphs, merges evidence, and makes explicit conditional transitions.</p></div></article>
+          <article class="detail"><span>04</span><div><h3>Cross-model swarm</h3><p>Architects, researchers, builders, critics, and evaluators are selected by capability. Critics should use a different model family from proposers.</p></div></article>
+          <article class="detail"><span>05</span><div><h3>Model plane</h3><p>LiteLLM normalizes invocation, routing, fallback, limits, and accounting while a capability registry preserves meaningful provider differences.</p></div></article>
+          <article class="detail"><span>06</span><div><h3>Tools and isolation</h3><p>An MCP host governs focused tool servers. Coding workers receive separate worktrees or containers and return patches to one integration owner.</p></div></article>
+          <article class="detail"><span>07</span><div><h3>State and evidence</h3><p>Temporal stores execution history; PostgreSQL stores jobs and organizational memory; the artifact store retains sources, reports, patches, and tests.</p></div></article>
+          <article class="detail"><span>08</span><div><h3>Evaluation and telemetry</h3><p>Deterministic tests and policy checks gate completion. OpenTelemetry correlates traces, metrics, and logs across every runtime boundary.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="validation">
+      <div class="content">
+        <div class="section-head"><div><span class="section-label">Reference check</span><h2>Validated against primary documentation</h2></div><p>Framework capabilities are sourced below. The provider-neutral organization definition and the combined operating model are architectural design choices.</p></div>
+        <div class="references">
+          <article class="reference"><span class="status">✓ Validated</span><h3>LangGraph</h3><p>State, nodes, conditional edges, parallel branches, subgraphs, checkpoints, and resumable human intervention.</p><a href="https://docs.langchain.com/oss/python/langgraph/graph-api">Graph API ↗</a></article>
+          <article class="reference"><span class="status">✓ Validated</span><h3>Temporal + LangGraph</h3><p>Official Python integration supplies durable execution, retries, and timeouts; the integration is currently Public Preview.</p><a href="https://docs.temporal.io/develop/python/integrations/langgraph">Integration guide ↗</a></article>
+          <article class="reference"><span class="status">✓ Validated</span><h3>LiteLLM</h3><p>A common provider API with proxy authentication, logging, spend tracking, routing, fallback, and rate limits.</p><a href="https://docs.litellm.ai/">Gateway docs ↗</a></article>
+          <article class="reference"><span class="status">✓ Validated</span><h3>MCP</h3><p>Host-controlled client/server boundaries for composable tools, resources, and prompts with negotiated capabilities.</p><a href="https://modelcontextprotocol.io/specification/2025-06-18/architecture">Architecture spec ↗</a></article>
+          <article class="reference"><span class="status">✓ Validated</span><h3>Git worktrees</h3><p>Multiple independent working trees and branches attached to a shared repository.</p><a href="https://git-scm.com/docs/git-worktree.html">Git manual ↗</a></article>
+          <article class="reference"><span class="status">✓ Validated</span><h3>OpenTelemetry</h3><p>Vendor-neutral generation, collection, and export of traces, metrics, and logs across distributed components.</p><a href="https://opentelemetry.io/docs/">OTel docs ↗</a></article>
+        </div>
+        <aside class="method-note">
+          <div><span class="section-label">Diagram method</span><h3>Purposeful abstraction, consistent notation.</h3></div>
+          <p>The drawing borrows proven communication rules—not a vendor’s visual template. It uses C4’s explicit types, boundaries, descriptions, and labeled one-way relationships; Microsoft’s guidance on directional arrows, legends, consistency, metadata, and progressive disclosure; and the AWS and Google convention of pairing recognizable service identifiers with names. See the <a href="https://c4model.com/diagrams/notation">C4 notation guidance</a>, <a href="https://learn.microsoft.com/en-us/azure/well-architected/architect-role/design-diagrams">Microsoft architecture-diagram practices</a>, <a href="https://aws.amazon.com/architecture/icons/">AWS architecture resources</a>, and <a href="https://cloud.google.com/icons">Google Cloud icon library</a>.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© <span id="year">2026</span> Todd Swepston</span><span>AI platform architecture · Columbus, Ohio</span></footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
