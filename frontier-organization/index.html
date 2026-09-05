@@ -142,8 +142,11 @@
     .elastic-diagram .count-caption { fill: #777; font-size: 8px; font-weight: 700; letter-spacing: .6px; }
     .elastic-diagram .runtime-bus { fill: none; stroke: #454545; stroke-width: 1.6; marker-end: url(#elastic-arrow); vector-effect: non-scaling-stroke; }
     .elastic-diagram .runtime-line { fill: none; stroke: #454545; stroke-width: 1.5; marker-end: url(#elastic-arrow); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .runtime-trunk { fill: none; stroke: #454545; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
     .elastic-diagram .placement-line { fill: none; stroke: #159a9c; stroke-width: 1.35; stroke-dasharray: 6 5; marker-end: url(#elastic-arrow-teal); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .placement-trunk { fill: none; stroke: #159a9c; stroke-width: 1.35; stroke-dasharray: 6 5; vector-effect: non-scaling-stroke; }
     .elastic-diagram .metric-line { fill: none; stroke: #796b87; stroke-width: 1.25; stroke-dasharray: 3 4; marker-end: url(#elastic-arrow-plum); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .metric-trunk { fill: none; stroke: #796b87; stroke-width: 1.25; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
     .elastic-diagram .policy-line { fill: none; stroke: #8c6d49; stroke-width: 1.25; stroke-dasharray: 6 5; marker-end: url(#elastic-arrow-gold); vector-effect: non-scaling-stroke; }
     .elastic-diagram .internal-line { fill: none; stroke: #777; stroke-width: 1.05; marker-end: url(#elastic-arrow-small); vector-effect: non-scaling-stroke; }
     .elastic-diagram .lifecycle-band { fill: #f7f7f5; stroke: #bbb; stroke-width: 1.05; }
@@ -152,6 +155,9 @@
     .elastic-diagram .phase-title { fill: #333; font-size: 10px; font-weight: 700; letter-spacing: .65px; }
     .elastic-diagram .phase-detail { fill: #777; font-size: 8.5px; }
     .elastic-diagram .phase-arrow { fill: none; stroke: #777; stroke-width: 1.1; marker-end: url(#elastic-arrow-small); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .source-card { fill: #fff; stroke: #777; stroke-width: 1.05; }
+    .elastic-diagram .source-type { fill: #777; font-size: 7px; font-weight: 700; letter-spacing: .55px; text-anchor: middle; }
+    .elastic-diagram .source-title { fill: #242424; font-size: 8px; font-weight: 700; letter-spacing: .35px; text-anchor: middle; }
     .elastic-diagram .elastic-label-bg { fill: #fff; fill-opacity: .95; stroke: #d7d7d7; stroke-width: .75; }
     .elastic-diagram .elastic-label { fill: #555; font-size: 9px; font-weight: 700; letter-spacing: .45px; }
     .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
@@ -545,8 +551,12 @@
               </g>
 
               <!-- objective and persistent runtime links -->
-              <path d="M8 166H45V211H452V199" class="runtime-line"/>
-              <g class="edge-label"><rect x="16" y="179" width="86" height="22" rx="4" class="label-bg"/><text x="27" y="194" class="edge-text">OBJECTIVE</text></g>
+              <g>
+                <rect x="4" y="143" width="56" height="46" rx="3" class="source-card"/>
+                <text x="32" y="159" class="source-type">EXTERNAL</text>
+                <text x="32" y="176" class="source-title">OBJECTIVE</text>
+              </g>
+              <path d="M60 166H69V212H330V166H350" class="runtime-line"/>
               <path d="M555 166H595" class="runtime-line"/>
               <path d="M195 199V228H685V199" class="policy-line"/>
               <g class="edge-label"><rect x="328" y="211" width="112" height="22" rx="4" class="label-bg"/><text x="339" y="226" class="edge-text">ROLE + AUTHORITY</text></g>
@@ -557,8 +567,11 @@
               <rect x="60" y="245" width="1320" height="180" class="demand-zone"/>
               <g class="zone-heading"><rect x="72" y="253" width="290" height="24" rx="3" class="zone-label-bg"/><text x="82" y="270" class="zone-label">DURABLE DEMAND + PLACEMENT PLANE</text></g>
 
-              <path d="M705 199V284H168M705 284H728" class="runtime-line"/>
-              <path d="M168 284V300M353 284V300M538 284V300M723 284V300" class="runtime-line"/>
+              <path d="M705 199V284M168 284H723" class="runtime-trunk"/>
+              <path d="M168 284V300" class="runtime-line"/>
+              <path d="M353 284V300" class="runtime-line"/>
+              <path d="M538 284V300" class="runtime-line"/>
+              <path d="M723 284V300" class="runtime-line"/>
               <g class="edge-label"><rect x="455" y="272" width="112" height="22" rx="4" class="label-bg"/><text x="466" y="287" class="edge-text">SCHEDULE ACTIVITIES</text></g>
 
               <g>
@@ -609,11 +622,17 @@
               <g class="edge-label"><rect x="974" y="230" width="120" height="22" rx="4" class="label-bg"/><text x="985" y="245" class="edge-text">PLACEMENT POLICY</text></g>
 
               <!-- polling and placement buses -->
-              <path d="M445 382V454H220M445 454H1222" class="runtime-bus"/>
-              <path d="M220 454V516M555 454V516M890 454V516M1222 454V516" class="runtime-bus"/>
-              <g class="edge-label"><rect x="260" y="430" width="144" height="22" rx="4" class="label-bg"/><text x="271" y="445" class="edge-text">TASK POLLING + DISPATCH</text></g>
-              <path d="M1105 390V478H240M1105 478H1242" class="placement-line"/>
-              <path d="M240 478V516M575 478V516M910 478V516M1242 478V516" class="placement-line"/>
+              <path d="M168 382V445M353 382V445M538 382V445M723 382V445M168 445H1222" class="runtime-trunk"/>
+              <path d="M220 445V500" class="runtime-line"/>
+              <path d="M555 445V500" class="runtime-line"/>
+              <path d="M890 445V500" class="runtime-line"/>
+              <path d="M1222 445V500" class="runtime-line"/>
+              <g class="edge-label"><rect x="260" y="432" width="174" height="22" rx="4" class="label-bg"/><text x="271" y="447" class="edge-text">WORKER POLL / TASK DISPATCH</text></g>
+              <path d="M1105 390V478M240 478H1242" class="placement-trunk"/>
+              <path d="M240 478V500" class="placement-line"/>
+              <path d="M575 478V500" class="placement-line"/>
+              <path d="M910 478V500" class="placement-line"/>
+              <path d="M1242 478V500" class="placement-line"/>
               <g class="edge-label"><rect x="835" y="458" width="130" height="22" rx="4" class="label-bg"/><text x="846" y="473" class="edge-text">SCALE · PLACE · DRAIN</text></g>
 
               <!-- hybrid execution cells -->
@@ -682,8 +701,9 @@
               </g>
 
               <!-- metrics return to placement control -->
-              <path d="M220 735V768H1105V390M555 735V768M890 735V768M1222 735V768" class="metric-line"/>
-              <g class="edge-label"><rect x="923" y="748" width="160" height="22" rx="4" class="label-bg"/><text x="934" y="763" class="edge-text">UTILIZATION · COST · LATENCY</text></g>
+              <path d="M220 752V768M555 752V768M890 752V768M1222 752V768M220 768H1222" class="metric-trunk"/>
+              <path d="M1057 768V390" class="metric-line"/>
+              <g class="edge-label"><rect x="880" y="757" width="160" height="22" rx="4" class="label-bg"/><text x="891" y="772" class="edge-text">UTILIZATION · COST · LATENCY</text></g>
 
               <!-- capability lifecycle -->
               <rect x="60" y="790" width="1320" height="108" class="lifecycle-band"/>
@@ -697,7 +717,7 @@
             </svg>
           </div>
           <div class="diagram-note">Swipe horizontally to inspect the deployment view at a readable scale.</div>
-          <div class="diagram-assurance"><strong>Deployment and scaling constraints.</strong> Temporal Task Queues retain Workflow and Activity Tasks when Workers are unavailable, and Workers poll only when they have capacity. Temporal Cloud manages the Temporal Service, not the application Workers shown in the execution cells. The elasticity and placement controller is an implementation component that connects Temporal metrics and policy to Kubernetes or cloud autoscalers. The named cloud products are representative implementation options, not required components. A 0-N pool is possible only where the runtime and cold-start objective permit it; maintain a warm minimum for latency-sensitive orchestration, slow-loading models, or privileged access. Results return through the same Task Queue path, and large artifacts remain outside Workflow Event History.</div>
+          <div class="diagram-assurance"><strong>Deployment and scaling constraints.</strong> Temporal Task Queues retain Workflow and Activity Tasks when Workers are unavailable, and Workers poll only when they have capacity. Temporal Cloud manages the Temporal Service, not the application Workers shown in the execution cells. The elasticity and placement controller is an implementation component that connects Temporal metrics and policy to Kubernetes or cloud autoscalers. The named cloud products are representative implementation options, not required components. A 0-N pool is possible only where the runtime and cold-start objective permit it; maintain a warm minimum for latency-sensitive orchestration, slow-loading models, or privileged access. Activity completions are reported by Workers to the Temporal Service; that return channel is omitted for clarity. Large artifacts remain outside Workflow Event History.</div>
           <div class="legend" aria-label="Elastic deployment diagram legend"><span><i></i>Task scheduling or dispatch</span><span><i class="dashed"></i>Policy dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>Scaling metric</span><span><i style="border-color:#159a9c;border-top-style:dashed"></i>Placement or scale command</span><span><i class="boundary"></i>Execution cell</span></div>
         </figure>
       </div>
