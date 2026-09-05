@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A current, source-validated logical reference architecture for a provider-neutral organization of frontier AI models.">
   <link rel="canonical" href="https://toddswepston.com/frontier-organization/">
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Frontier Organization Architecture - Todd Swepston">
   <meta property="og:description" content="A source-validated logical architecture for coordinating specialist agents across frontier model providers.">
-  <title>Frontier Organization Architecture - Todd Swepston</title>
+  <title>Todd Swepston - Frontier Organization Architecture</title>
   <style>
     @font-face { font-family: "Slim Joe"; src: url("https://toddswepston.com/assets/fonts/Slim-Joe/Slim-Joe.woff") format("woff"); font-display: swap; }
     @font-face { font-family: "Verlag"; src: url("https://toddswepston.com/assets/fonts/Verlag-Book/Verlag-Book.woff") format("woff"); font-weight: 400; font-display: swap; }
@@ -56,8 +57,27 @@
     .diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--line); background: var(--soft); }
     .diagram-id { font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
     .diagram-meta { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .diagram-open {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 8px 12px;
+      border: 1px solid var(--gold-dark); background: var(--night); color: #fff; cursor: pointer;
+      font: inherit; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      transition: background .2s ease, color .2s ease;
+    }
+    .diagram-open:hover, .diagram-open:focus { background: var(--gold); color: var(--night); }
+    .diagram-open:focus-visible, .viewer-button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+    .diagram-interaction-help {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 7px 14px; padding: 10px 18px;
+      border-bottom: 1px solid var(--line); background: #fff; color: #666; font-size: 11px; line-height: 1.5;
+    }
+    .diagram-interaction-help strong { color: var(--ink); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    kbd {
+      display: inline-block; min-width: 22px; padding: 1px 5px; border: 1px solid #c7c7c7;
+      background: var(--soft); color: #444; font: 700 10px/1.5 "Verlag", "Helvetica Neue", Arial, sans-serif; text-align: center;
+    }
     .diagram-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
     .diagram-scroll svg { display: block; width: 100%; min-width: 1120px; height: auto; }
+    .diagram-scroll svg.diagram { cursor: zoom-in; }
+    .diagram-placeholder { width: 100%; background: var(--soft); }
     .diagram-note { display: none; padding: 9px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; text-align: center; }
     .diagram-assurance { padding: 12px 18px; border-top: 1px solid var(--line); background: #fbfaf8; color: #666; font-size: 12px; line-height: 1.55; }
     .legend { display: flex; flex-wrap: wrap; gap: 18px 28px; padding: 15px 18px; border-top: 1px solid var(--line); color: #666; font-size: 12px; }
@@ -186,6 +206,44 @@
     .back-to-top-ready .back-to-top { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(8px); }
     .back-to-top-ready .back-to-top.is-visible { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
     .back-to-top:hover, .back-to-top:focus { background: var(--gold); color: var(--night); transform: translateY(-2px); }
+    body.diagram-viewer-open { overflow: hidden; }
+    .diagram-viewer {
+      position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: clamp(10px, 2vw, 28px);
+      background: rgba(8,9,11,.88); backdrop-filter: blur(8px);
+    }
+    .diagram-viewer[hidden] { display: none; }
+    .viewer-shell {
+      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; width: min(1600px, 100%); height: min(94vh, 1080px);
+      border: 1px solid rgba(197,164,126,.72); background: #fff; box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+    .viewer-toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; min-height: 58px; padding: 10px 14px;
+      border-bottom: 1px solid #333; background: var(--night); color: #fff;
+    }
+    .viewer-heading { min-width: 210px; margin-right: auto; }
+    .viewer-eyebrow { display: block; color: var(--gold); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .viewer-title { display: block; margin-top: 3px; font-size: 14px; font-weight: 700; }
+    .viewer-control-group { display: inline-flex; align-items: center; gap: 6px; }
+    .viewer-control-label { color: rgba(255,255,255,.68); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .viewer-button {
+      display: inline-flex; align-items: center; justify-content: center; min-width: 38px; min-height: 38px; padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.32); background: transparent; color: #fff; cursor: pointer;
+      font: inherit; font-size: 12px; font-weight: 700;
+    }
+    .viewer-button:hover, .viewer-button:focus { border-color: var(--gold); background: var(--gold); color: var(--night); }
+    .viewer-button.wide { min-width: auto; gap: 7px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .viewer-zoom-status { min-width: 52px; color: #fff; font-size: 11px; font-weight: 700; text-align: center; }
+    .viewer-stage { position: relative; min-height: 0; overflow: hidden; background: #fff; cursor: grab; touch-action: none; user-select: none; }
+    .viewer-stage.is-dragging { cursor: grabbing; }
+    .viewer-stage:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
+    .viewer-world { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; }
+    .viewer-world svg.diagram { display: block; width: 100%; height: 100%; min-width: 0; max-width: none; }
+    .viewer-help {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 10px 14px;
+      border-top: 1px solid var(--line); background: var(--soft); color: #555; font-size: 11px; line-height: 1.55;
+    }
+    .viewer-help strong { color: var(--ink); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .viewer-help span { white-space: nowrap; }
     footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px max(5vw,24px); border-top: 1px solid #252525; color: rgba(255,255,255,.55); background: var(--night); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
     @media (max-width: 800px) {
       .section-head { grid-template-columns: 1fr; gap: 15px; }
@@ -202,10 +260,24 @@
       .nav-home .brand { display: none; }
       .back-link { min-height: 36px; padding: 7px 10px; font-size: 10px; }
       .hero { padding-top: 70px; }
+      .diagram-toolbar { align-items: flex-start; }
+      .diagram-open { width: 100%; }
+      .diagram-interaction-help { align-items: flex-start; }
       .reference { grid-template-columns: 1fr; gap: 7px; }
       .reference a { grid-column: 1; }
       .back-to-top { right: 14px; bottom: 14px; padding: 10px 12px; }
+      .diagram-viewer { padding: 0; }
+      .viewer-shell { width: 100%; height: 100dvh; border: 0; }
+      .viewer-toolbar { gap: 8px; padding: 8px; }
+      .viewer-heading { flex-basis: 100%; }
+      .viewer-control-label { display: none; }
+      .viewer-help { gap: 6px 12px; padding: 8px 10px; }
+      .viewer-help span { white-space: normal; }
       footer { flex-direction: column; }
+    }
+    @media (pointer: coarse) {
+      .diagram-open, .viewer-button { min-height: 44px; }
+      .viewer-button { min-width: 44px; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
@@ -240,7 +312,9 @@
           <figcaption class="diagram-toolbar">
             <span class="diagram-id">Provider-neutral synthetic organization</span>
             <span class="diagram-meta">Logical component + runtime flow · v1.2 · reviewed 5 September 2026</span>
+            <button class="diagram-open" type="button" data-diagram-target="architecture-diagram" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Explore diagram</button>
           </figcaption>
+          <div class="diagram-interaction-help"><strong>Interactive view</strong><span>Click the diagram or use Explore diagram.</span><span>Drag or arrow keys to pan.</span><span>Scroll or pinch to zoom.</span><span><kbd>+</kbd> <kbd>-</kbd> zoom</span><span><kbd>0</kbd> reset</span><span><kbd>Esc</kbd> close</span></div>
           <div class="diagram-scroll">
             <svg class="diagram" viewBox="0 0 1440 900" role="img" aria-labelledby="diagram-title diagram-desc">
               <title id="diagram-title">Provider-neutral frontier model organization reference architecture</title>
@@ -489,7 +563,9 @@
           <figcaption class="diagram-toolbar">
             <span class="diagram-id">Provider-neutral synthetic organization</span>
             <span class="diagram-meta">Deployment + dynamic view · v1.0 · reviewed 5 September 2026</span>
+            <button class="diagram-open" type="button" data-diagram-target="elastic-deployment-diagram" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Explore diagram</button>
           </figcaption>
+          <div class="diagram-interaction-help"><strong>Interactive view</strong><span>Click the diagram or use Explore diagram.</span><span>Drag or arrow keys to pan.</span><span>Scroll or pinch to zoom.</span><span><kbd>+</kbd> <kbd>-</kbd> zoom</span><span><kbd>0</kbd> reset</span><span><kbd>Esc</kbd> close</span></div>
           <div class="diagram-scroll">
             <svg class="diagram elastic-diagram" viewBox="0 0 1440 960" role="img" aria-labelledby="elastic-title elastic-desc">
               <title id="elastic-title">Elastic deployment of the provider-neutral frontier organization</title>
@@ -561,7 +637,7 @@
               <path d="M195 199V228H685V199" class="policy-line"/>
               <g class="edge-label"><rect x="328" y="211" width="112" height="22" rx="4" class="label-bg"/><text x="339" y="226" class="edge-text">ROLE + AUTHORITY</text></g>
               <path d="M1228 199V238H725V199" class="policy-line"/>
-              <g class="edge-label"><rect x="1008" y="221" width="116" height="22" rx="4" class="label-bg"/><text x="1019" y="236" class="edge-text">APPROVAL POLICY</text></g>
+              <g class="edge-label"><rect x="1199" y="221" width="116" height="22" rx="4" class="label-bg"/><text x="1210" y="236" class="edge-text">APPROVAL POLICY</text></g>
 
               <!-- durable demand and placement plane -->
               <rect x="60" y="245" width="1320" height="180" class="demand-zone"/>
@@ -619,7 +695,7 @@
               <path d="M800 341H860" class="metric-line"/>
               <g class="edge-label"><rect x="790" y="311" width="92" height="22" rx="4" class="label-bg"/><text x="801" y="326" class="edge-text">QUEUE METRICS</text></g>
               <path d="M965 199V285" class="policy-line"/>
-              <g class="edge-label"><rect x="974" y="230" width="120" height="22" rx="4" class="label-bg"/><text x="985" y="245" class="edge-text">PLACEMENT POLICY</text></g>
+              <g class="edge-label"><rect x="974" y="252" width="120" height="22" rx="4" class="label-bg"/><text x="985" y="267" class="edge-text">PLACEMENT POLICY</text></g>
 
               <!-- polling and placement buses -->
               <path d="M168 382V445M353 382V445M538 382V445M723 382V445M168 445H1222" class="runtime-trunk"/>
@@ -771,6 +847,40 @@
 
   <footer><span>© <span id="year">2026</span> Todd Swepston</span><span>AI platform architecture · Columbus, Ohio</span></footer>
   <a class="back-to-top" href="#top"><span aria-hidden="true">↑</span> Back to top</a>
+
+  <div class="diagram-viewer" id="diagram-viewer" hidden>
+    <div class="viewer-shell" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+      <div class="viewer-toolbar">
+        <div class="viewer-heading"><span class="viewer-eyebrow">Interactive architecture view</span><span class="viewer-title" id="viewer-title">Architecture diagram</span></div>
+        <div class="viewer-control-group" aria-label="Pan controls">
+          <span class="viewer-control-label">Pan</span>
+          <button class="viewer-button" type="button" data-viewer-action="pan-left" aria-label="Pan left">←</button>
+          <button class="viewer-button" type="button" data-viewer-action="pan-up" aria-label="Pan up">↑</button>
+          <button class="viewer-button" type="button" data-viewer-action="pan-down" aria-label="Pan down">↓</button>
+          <button class="viewer-button" type="button" data-viewer-action="pan-right" aria-label="Pan right">→</button>
+        </div>
+        <div class="viewer-control-group" aria-label="Zoom controls">
+          <span class="viewer-control-label">Zoom</span>
+          <button class="viewer-button" type="button" data-viewer-action="zoom-out" aria-label="Zoom out">−</button>
+          <span class="viewer-zoom-status" id="viewer-zoom-status" aria-live="polite">100%</span>
+          <button class="viewer-button" type="button" data-viewer-action="zoom-in" aria-label="Zoom in">+</button>
+        </div>
+        <button class="viewer-button wide" type="button" data-viewer-action="reset"><span aria-hidden="true">↺</span> Reset</button>
+        <button class="viewer-button wide" type="button" data-viewer-action="close"><span aria-hidden="true">×</span> Close</button>
+      </div>
+      <div class="viewer-stage" id="viewer-stage" aria-label="Interactive diagram. Drag to pan and scroll or pinch to zoom.">
+        <div class="viewer-world" id="viewer-world"></div>
+      </div>
+      <div class="viewer-help" aria-label="Diagram viewer controls">
+        <strong>Controls</strong>
+        <span>Drag or <kbd>Arrow keys</kbd> to pan</span>
+        <span>Scroll, pinch, <kbd>+</kbd> or <kbd>-</kbd> to zoom</span>
+        <span><kbd>0</kbd> reset</span>
+        <span><kbd>Esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -833,6 +943,243 @@
     } else {
       window.addEventListener("load", fitDiagramLabels, { once: true });
     }
+
+    var diagramViewer = document.getElementById("diagram-viewer");
+    var viewerStage = document.getElementById("viewer-stage");
+    var viewerWorld = document.getElementById("viewer-world");
+    var viewerTitle = document.getElementById("viewer-title");
+    var viewerZoomStatus = document.getElementById("viewer-zoom-status");
+    var activeDiagram = null;
+    var diagramPlaceholder = null;
+    var returnFocusTarget = null;
+    var viewState = { scale: 1, x: 0, y: 0 };
+    var activePointers = new Map();
+    var dragStart = null;
+    var pinchStart = null;
+
+    function constrainDiagramView() {
+      var width = viewerStage.clientWidth;
+      var height = viewerStage.clientHeight;
+      var minX = Math.min(0, width - width * viewState.scale);
+      var minY = Math.min(0, height - height * viewState.scale);
+      viewState.x = Math.max(minX, Math.min(0, viewState.x));
+      viewState.y = Math.max(minY, Math.min(0, viewState.y));
+    }
+
+    function renderDiagramView() {
+      constrainDiagramView();
+      viewerWorld.style.transform = "translate(" + viewState.x + "px," + viewState.y + "px) scale(" + viewState.scale + ")";
+      viewerZoomStatus.textContent = Math.round(viewState.scale * 100) + "%";
+    }
+
+    function resetDiagramView() {
+      viewState.scale = 1;
+      viewState.x = 0;
+      viewState.y = 0;
+      renderDiagramView();
+    }
+
+    function zoomDiagram(nextScale, clientX, clientY) {
+      var previousScale = viewState.scale;
+      nextScale = Math.max(1, Math.min(5, nextScale));
+      if (nextScale === previousScale) return;
+      var bounds = viewerStage.getBoundingClientRect();
+      var pointX = typeof clientX === "number" ? clientX - bounds.left : bounds.width / 2;
+      var pointY = typeof clientY === "number" ? clientY - bounds.top : bounds.height / 2;
+      var ratio = nextScale / previousScale;
+      viewState.x = pointX - (pointX - viewState.x) * ratio;
+      viewState.y = pointY - (pointY - viewState.y) * ratio;
+      viewState.scale = nextScale;
+      renderDiagramView();
+    }
+
+    function panDiagram(deltaX, deltaY) {
+      viewState.x += deltaX;
+      viewState.y += deltaY;
+      renderDiagramView();
+    }
+
+    function openDiagramViewer(diagram, trigger) {
+      if (!diagram || activeDiagram) return;
+      activeDiagram = diagram;
+      returnFocusTarget = trigger || null;
+      var sourceParent = diagram.parentNode;
+      var bounds = diagram.getBoundingClientRect();
+      diagramPlaceholder = document.createElement("div");
+      diagramPlaceholder.className = "diagram-placeholder";
+      diagramPlaceholder.style.height = bounds.height + "px";
+      diagramPlaceholder.setAttribute("aria-hidden", "true");
+      sourceParent.replaceChild(diagramPlaceholder, diagram);
+      viewerWorld.appendChild(diagram);
+      diagram.classList.add("viewer-svg");
+      var title = diagram.querySelector("title");
+      viewerTitle.textContent = title ? title.textContent : "Architecture diagram";
+      diagramViewer.hidden = false;
+      document.body.classList.add("diagram-viewer-open");
+      resetDiagramView();
+      var closeButton = diagramViewer.querySelector('[data-viewer-action="close"]');
+      if (closeButton) closeButton.focus();
+    }
+
+    function closeDiagramViewer() {
+      if (!activeDiagram) return;
+      activeDiagram.classList.remove("viewer-svg");
+      if (diagramPlaceholder && diagramPlaceholder.parentNode) {
+        diagramPlaceholder.parentNode.replaceChild(activeDiagram, diagramPlaceholder);
+      }
+      activeDiagram = null;
+      diagramPlaceholder = null;
+      viewerWorld.style.transform = "";
+      diagramViewer.hidden = true;
+      document.body.classList.remove("diagram-viewer-open");
+      activePointers.clear();
+      dragStart = null;
+      pinchStart = null;
+      if (returnFocusTarget && typeof returnFocusTarget.focus === "function") returnFocusTarget.focus();
+      returnFocusTarget = null;
+    }
+
+    document.querySelectorAll(".diagram-open").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var frame = document.getElementById(button.getAttribute("data-diagram-target"));
+        openDiagramViewer(frame ? frame.querySelector("svg.diagram") : null, button);
+      });
+    });
+
+    document.querySelectorAll(".diagram-scroll svg.diagram").forEach(function (diagram) {
+      diagram.addEventListener("click", function () {
+        var frame = diagram.closest(".diagram-frame");
+        openDiagramViewer(diagram, frame ? frame.querySelector(".diagram-open") : null);
+      });
+    });
+
+    diagramViewer.querySelectorAll("[data-viewer-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-viewer-action");
+        if (action === "close") closeDiagramViewer();
+        if (action === "reset") resetDiagramView();
+        if (action === "zoom-in") zoomDiagram(viewState.scale * 1.25);
+        if (action === "zoom-out") zoomDiagram(viewState.scale / 1.25);
+        if (action === "pan-left") panDiagram(70, 0);
+        if (action === "pan-right") panDiagram(-70, 0);
+        if (action === "pan-up") panDiagram(0, 70);
+        if (action === "pan-down") panDiagram(0, -70);
+      });
+    });
+
+    viewerStage.addEventListener("wheel", function (event) {
+      event.preventDefault();
+      zoomDiagram(viewState.scale * (event.deltaY < 0 ? 1.12 : 1 / 1.12), event.clientX, event.clientY);
+    }, { passive: false });
+
+    viewerStage.addEventListener("dblclick", function (event) {
+      zoomDiagram(viewState.scale * 1.35, event.clientX, event.clientY);
+    });
+
+    viewerStage.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0 && event.pointerType === "mouse") return;
+      viewerStage.setPointerCapture(event.pointerId);
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size === 1) {
+        dragStart = { pointerX: event.clientX, pointerY: event.clientY, x: viewState.x, y: viewState.y };
+        viewerStage.classList.add("is-dragging");
+      }
+      if (activePointers.size === 2) {
+        var points = Array.from(activePointers.values());
+        var centerX = (points[0].x + points[1].x) / 2;
+        var centerY = (points[0].y + points[1].y) / 2;
+        var stageBounds = viewerStage.getBoundingClientRect();
+        pinchStart = {
+          distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y),
+          scale: viewState.scale,
+          x: viewState.x,
+          y: viewState.y,
+          centerX: centerX - stageBounds.left,
+          centerY: centerY - stageBounds.top
+        };
+        dragStart = null;
+      }
+    });
+
+    viewerStage.addEventListener("pointermove", function (event) {
+      if (!activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size === 2 && pinchStart) {
+        var points = Array.from(activePointers.values());
+        var distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        var nextScale = Math.max(1, Math.min(5, pinchStart.scale * distance / Math.max(1, pinchStart.distance)));
+        var stageBounds = viewerStage.getBoundingClientRect();
+        var centerX = (points[0].x + points[1].x) / 2 - stageBounds.left;
+        var centerY = (points[0].y + points[1].y) / 2 - stageBounds.top;
+        var contentX = (pinchStart.centerX - pinchStart.x) / pinchStart.scale;
+        var contentY = (pinchStart.centerY - pinchStart.y) / pinchStart.scale;
+        viewState.scale = nextScale;
+        viewState.x = centerX - contentX * nextScale;
+        viewState.y = centerY - contentY * nextScale;
+        renderDiagramView();
+      } else if (activePointers.size === 1 && dragStart) {
+        viewState.x = dragStart.x + event.clientX - dragStart.pointerX;
+        viewState.y = dragStart.y + event.clientY - dragStart.pointerY;
+        renderDiagramView();
+      }
+    });
+
+    function endDiagramPointer(event) {
+      activePointers.delete(event.pointerId);
+      if (activePointers.size === 1) {
+        var remaining = Array.from(activePointers.values())[0];
+        dragStart = { pointerX: remaining.x, pointerY: remaining.y, x: viewState.x, y: viewState.y };
+      } else {
+        dragStart = null;
+      }
+      pinchStart = null;
+      if (!activePointers.size) viewerStage.classList.remove("is-dragging");
+    }
+
+    viewerStage.addEventListener("pointerup", endDiagramPointer);
+    viewerStage.addEventListener("pointercancel", endDiagramPointer);
+
+    diagramViewer.addEventListener("click", function (event) {
+      if (event.target === diagramViewer) closeDiagramViewer();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (diagramViewer.hidden) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeDiagramViewer();
+        return;
+      }
+      if (event.key === "+" || event.key === "=") {
+        event.preventDefault();
+        zoomDiagram(viewState.scale * 1.25);
+      }
+      if (event.key === "-") {
+        event.preventDefault();
+        zoomDiagram(viewState.scale / 1.25);
+      }
+      if (event.key === "0") {
+        event.preventDefault();
+        resetDiagramView();
+      }
+      var step = event.shiftKey ? 120 : 55;
+      if (event.key === "ArrowLeft") { event.preventDefault(); panDiagram(step, 0); }
+      if (event.key === "ArrowRight") { event.preventDefault(); panDiagram(-step, 0); }
+      if (event.key === "ArrowUp") { event.preventDefault(); panDiagram(0, step); }
+      if (event.key === "ArrowDown") { event.preventDefault(); panDiagram(0, -step); }
+      if (event.key === "Tab") {
+        var controls = Array.from(diagramViewer.querySelectorAll("button"));
+        if (!controls.length) return;
+        var first = controls[0];
+        var last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+
+    window.addEventListener("resize", function () {
+      if (!diagramViewer.hidden) renderDiagramView();
+    });
   </script>
 </body>
 </html>
