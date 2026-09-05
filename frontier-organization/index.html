@@ -309,7 +309,7 @@
                   <rect x="806" y="484" width="50" height="48" rx="2" fill="#73549d"/><path d="M818 501l7 7 17-17M817 518h26" class="icon-line"/><text x="831" y="545" class="mini-detail">Critic</text>
                 </g>
               </g>
-              <g>
+              <g class="completion-gate">
                 <rect x="493" y="535" width="194" height="68" rx="34" class="gate"/>
                 <text x="590" y="562" class="gate-title">COMPLETION GATE</text>
                 <text x="590" y="582" class="gate-detail">tests · policy · evidence · confidence</text>
@@ -467,11 +467,20 @@
     updateBackToTop();
     window.addEventListener("scroll", updateBackToTop, { passive: true });
 
-    function fitDiagramLabels() {
+    function promoteDiagramForeground() {
       var diagram = document.querySelector(".diagram");
+      var completionGate = diagram.querySelector(".completion-gate");
+      if (completionGate) diagram.appendChild(completionGate);
+      Array.from(diagram.querySelectorAll(".zone-heading")).forEach(function (heading) {
+        diagram.appendChild(heading);
+      });
       Array.from(diagram.querySelectorAll(".edge-label")).forEach(function (label) {
         diagram.appendChild(label);
       });
+    }
+    promoteDiagramForeground();
+
+    function fitDiagramLabels() {
       document.querySelectorAll(".diagram .edge-label").forEach(function (label) {
         var background = label.querySelector(".label-bg");
         var content = Array.from(label.querySelectorAll("text, circle"));
