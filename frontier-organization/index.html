@@ -118,6 +118,42 @@
     .diagram .gate { fill: #242424; }
     .diagram .gate-title { fill: #fff; font-size: 12px; font-weight: 700; text-anchor: middle; }
     .diagram .gate-detail { fill: #d8d8d8; font-size: 9px; text-anchor: middle; }
+    .elastic-diagram .persistent-zone { fill: #faf7f2; stroke: #c8b49a; stroke-width: 1.2; }
+    .elastic-diagram .demand-zone { fill: #f7f9fa; stroke: #bcc8ce; stroke-width: 1.2; }
+    .elastic-diagram .cloud-cell { fill: #fff; stroke: #a9a9a9; stroke-width: 1.2; }
+    .elastic-diagram .cloud-cell.onprem { fill: #fafafa; }
+    .elastic-diagram .cloud-cell.aws { fill: #fbf7f1; }
+    .elastic-diagram .cloud-cell.azure { fill: #f3f8fa; }
+    .elastic-diagram .cloud-cell.gcp { fill: #f8f7fa; }
+    .elastic-diagram .cloud-band { stroke: none; }
+    .elastic-diagram .cloud-title { fill: #333; font-size: 11px; font-weight: 700; letter-spacing: .9px; }
+    .elastic-diagram .cloud-band-title { fill: #fff; font-size: 11px; font-weight: 700; letter-spacing: .9px; }
+    .elastic-diagram .cloud-subtitle { fill: #777; font-size: 9px; }
+    .elastic-diagram .control-card, .elastic-diagram .pool-card, .elastic-diagram .gateway-card, .elastic-diagram .endpoint-card { fill: #fff; stroke: #999; stroke-width: 1.05; }
+    .elastic-diagram .control-card.primary, .elastic-diagram .pool-card.primary { stroke: var(--gold-dark); stroke-width: 1.5; }
+    .elastic-diagram .queue-card { fill: #fff; stroke: #999; stroke-width: 1.05; }
+    .elastic-diagram .queue-role { fill: #fff; font-size: 9px; font-weight: 700; letter-spacing: .65px; }
+    .elastic-diagram .queue-name { fill: #2f2f2f; font-size: 11px; font-weight: 700; }
+    .elastic-diagram .queue-detail { fill: #777; font-size: 8.5px; }
+    .elastic-diagram .elastic-title { fill: #242424; font-size: 13px; font-weight: 700; }
+    .elastic-diagram .elastic-type { fill: #777; font-size: 8.5px; font-weight: 700; letter-spacing: .8px; }
+    .elastic-diagram .elastic-detail { fill: #6f6f6f; font-size: 9px; }
+    .elastic-diagram .count { fill: #242424; font-size: 20px; font-weight: 700; }
+    .elastic-diagram .count-caption { fill: #777; font-size: 8px; font-weight: 700; letter-spacing: .6px; }
+    .elastic-diagram .runtime-bus { fill: none; stroke: #454545; stroke-width: 1.6; marker-end: url(#elastic-arrow); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .runtime-line { fill: none; stroke: #454545; stroke-width: 1.5; marker-end: url(#elastic-arrow); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .placement-line { fill: none; stroke: #159a9c; stroke-width: 1.35; stroke-dasharray: 6 5; marker-end: url(#elastic-arrow-teal); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .metric-line { fill: none; stroke: #796b87; stroke-width: 1.25; stroke-dasharray: 3 4; marker-end: url(#elastic-arrow-plum); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .policy-line { fill: none; stroke: #8c6d49; stroke-width: 1.25; stroke-dasharray: 6 5; marker-end: url(#elastic-arrow-gold); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .internal-line { fill: none; stroke: #777; stroke-width: 1.05; marker-end: url(#elastic-arrow-small); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .lifecycle-band { fill: #f7f7f5; stroke: #bbb; stroke-width: 1.05; }
+    .elastic-diagram .phase { fill: #fff; stroke: #aaa; stroke-width: 1; }
+    .elastic-diagram .phase.active { fill: #f4faf9; stroke: #159a9c; stroke-width: 1.35; }
+    .elastic-diagram .phase-title { fill: #333; font-size: 10px; font-weight: 700; letter-spacing: .65px; }
+    .elastic-diagram .phase-detail { fill: #777; font-size: 8.5px; }
+    .elastic-diagram .phase-arrow { fill: none; stroke: #777; stroke-width: 1.1; marker-end: url(#elastic-arrow-small); vector-effect: non-scaling-stroke; }
+    .elastic-diagram .elastic-label-bg { fill: #fff; fill-opacity: .95; stroke: #d7d7d7; stroke-width: .75; }
+    .elastic-diagram .elastic-label { fill: #555; font-size: 9px; font-weight: 700; letter-spacing: .45px; }
     .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
     .detail { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 27px 28px 27px 0; border-bottom: 1px solid var(--line); }
     .detail:nth-child(odd) { border-right: 1px solid var(--line); }
@@ -174,7 +210,7 @@
       <a class="back-link" href="../"><span aria-hidden="true">←</span> Back to main site</a>
       <a class="brand" href="../">Todd Swepston</a>
     </div>
-    <nav aria-label="Page navigation"><a href="#architecture">Architecture</a><a href="#operating-model">Operating model</a><a href="#validation">Validation</a></nav>
+    <nav aria-label="Page navigation"><a href="#architecture">Architecture</a><a href="#elastic-deployment">Scaling</a><a href="#operating-model">Operating model</a><a href="#validation">Validation</a></nav>
   </header>
 
   <main>
@@ -436,6 +472,237 @@
       </div>
     </section>
 
+    <section id="elastic-deployment">
+      <div class="content">
+        <div class="section-head">
+          <div><span class="section-label">Architecture view 02</span><h2>Elastic deployment and capability lifecycle</h2></div>
+          <p>This deployment and dynamic view applies the components from View 01 to a hybrid execution topology. The organization and durable control plane persist; specialist Activity Workers, regional gateways, inference endpoints, and tool capacity can scale independently where policy and cold-start requirements permit.</p>
+        </div>
+
+        <figure id="elastic-deployment-diagram" class="diagram-frame">
+          <figcaption class="diagram-toolbar">
+            <span class="diagram-id">Provider-neutral synthetic organization</span>
+            <span class="diagram-meta">Deployment + dynamic view · v1.0 · reviewed 5 September 2026</span>
+          </figcaption>
+          <div class="diagram-scroll">
+            <svg class="diagram elastic-diagram" viewBox="0 0 1440 960" role="img" aria-labelledby="elastic-title elastic-desc">
+              <title id="elastic-title">Elastic deployment of the provider-neutral frontier organization</title>
+              <desc id="elastic-desc">The durable organization control plane stays available while LangGraph schedules specialist Activities onto Temporal Task Queues. A custom elasticity and placement controller observes backlog, latency, cost, quota, residency, and cold-start policy. Eligible Activity Worker pools and their model or tool capacity can scale across on-premises, AWS, Azure, and Google Cloud execution cells. After completion, workers drain and return to zero or a configured warm minimum.</desc>
+              <defs>
+                <marker id="elastic-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#454545"/></marker>
+                <marker id="elastic-arrow-small" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5 0 7z" fill="#777"/></marker>
+                <marker id="elastic-arrow-teal" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#159a9c"/></marker>
+                <marker id="elastic-arrow-plum" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#796b87"/></marker>
+                <marker id="elastic-arrow-gold" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4 0 8z" fill="#8c6d49"/></marker>
+              </defs>
+
+              <rect x="30" y="45" width="1380" height="875" rx="3" class="scope-boundary"/>
+              <text x="52" y="69" class="boundary-label">ELASTIC FRONTIER ORGANIZATION · HYBRID DEPLOYMENT VIEW</text>
+
+              <!-- persistent control plane -->
+              <rect x="60" y="88" width="1320" height="132" class="persistent-zone"/>
+              <g class="zone-heading"><rect x="72" y="96" width="270" height="24" rx="3" class="zone-label-bg"/><text x="82" y="113" class="zone-label">PERSISTENT ORGANIZATION CONTROL PLANE</text></g>
+
+              <g>
+                <rect x="80" y="133" width="230" height="66" rx="3" class="control-card primary"/>
+                <rect x="80" y="133" width="48" height="66" fill="#8c6d49"/>
+                <path d="M94 148h18l6 6v28H94zM112 148v7h6M100 161h12M100 168h12M100 175h8" class="icon-line"/>
+                <text x="143" y="152" class="elastic-type">PORTABLE GOVERNANCE</text>
+                <text x="143" y="173" class="elastic-title">Organization + policy</text>
+                <text x="143" y="190" class="elastic-detail">roles · authority · budgets</text>
+              </g>
+              <g>
+                <rect x="350" y="133" width="205" height="66" rx="3" class="control-card"/>
+                <rect x="350" y="133" width="48" height="66" fill="#73549d"/>
+                <circle cx="374" cy="164" r="14" class="icon-line"/><path d="M374 164v-9M374 164l8 6" class="icon-line"/>
+                <text x="413" y="152" class="elastic-type">DURABLE CONTROL</text>
+                <text x="413" y="173" class="elastic-title">Temporal Service</text>
+                <text x="413" y="190" class="elastic-detail">history · queues · timers</text>
+              </g>
+              <g>
+                <rect x="595" y="133" width="220" height="66" rx="3" class="control-card"/>
+                <rect x="595" y="133" width="48" height="66" fill="#8c6d49"/>
+                <circle cx="608" cy="153" r="4" fill="#fff"/><circle cx="630" cy="153" r="4" fill="#fff"/><circle cx="619" cy="178" r="4" fill="#fff"/><path d="M611 156l6 17M627 156l-6 17M612 153h14" class="icon-line"/>
+                <text x="658" y="152" class="elastic-type">MINIMUM WARM POOL</text>
+                <text x="658" y="173" class="elastic-title">LangGraph control Worker</text>
+                <text x="658" y="190" class="elastic-detail">route · assign · merge · gate</text>
+              </g>
+              <g>
+                <rect x="855" y="133" width="220" height="66" rx="3" class="control-card"/>
+                <rect x="855" y="133" width="48" height="66" fill="#159a9c"/>
+                <path d="M869 149h18l6 6v27h-24zM887 149v7h6M875 162h12M875 169h12M875 176h8" class="icon-line"/>
+                <text x="918" y="152" class="elastic-type">PLACEMENT INPUT</text>
+                <text x="918" y="173" class="elastic-title">Capability registry</text>
+                <text x="918" y="190" class="elastic-detail">skill · region · cost · quota</text>
+              </g>
+              <g>
+                <rect x="1115" y="133" width="225" height="66" rx="3" class="control-card"/>
+                <rect x="1115" y="133" width="48" height="66" fill="#b54f77"/>
+                <path d="M1128 165l7 7 16-18M1128 181h22" class="icon-line"/>
+                <text x="1178" y="152" class="elastic-type">RELEASE CONTROL</text>
+                <text x="1178" y="173" class="elastic-title">Approval + completion</text>
+                <text x="1178" y="190" class="elastic-detail">risk · evidence · cooldown</text>
+              </g>
+
+              <!-- objective and persistent runtime links -->
+              <path d="M8 166H45V211H452V199" class="runtime-line"/>
+              <g class="edge-label"><rect x="16" y="179" width="86" height="22" rx="4" class="label-bg"/><text x="27" y="194" class="edge-text">OBJECTIVE</text></g>
+              <path d="M555 166H595" class="runtime-line"/>
+              <path d="M195 199V228H685V199" class="policy-line"/>
+              <g class="edge-label"><rect x="328" y="211" width="112" height="22" rx="4" class="label-bg"/><text x="339" y="226" class="edge-text">ROLE + AUTHORITY</text></g>
+              <path d="M1228 199V238H725V199" class="policy-line"/>
+              <g class="edge-label"><rect x="1008" y="221" width="116" height="22" rx="4" class="label-bg"/><text x="1019" y="236" class="edge-text">APPROVAL POLICY</text></g>
+
+              <!-- durable demand and placement plane -->
+              <rect x="60" y="245" width="1320" height="180" class="demand-zone"/>
+              <g class="zone-heading"><rect x="72" y="253" width="290" height="24" rx="3" class="zone-label-bg"/><text x="82" y="270" class="zone-label">DURABLE DEMAND + PLACEMENT PLANE</text></g>
+
+              <path d="M705 199V284H168M705 284H728" class="runtime-line"/>
+              <path d="M168 284V300M353 284V300M538 284V300M723 284V300" class="runtime-line"/>
+              <g class="edge-label"><rect x="455" y="272" width="112" height="22" rx="4" class="label-bg"/><text x="466" y="287" class="edge-text">SCHEDULE ACTIVITIES</text></g>
+
+              <g>
+                <rect x="90" y="300" width="155" height="82" rx="3" class="queue-card"/>
+                <rect x="90" y="300" width="155" height="22" fill="#159a9c"/>
+                <text x="167.5" y="315" class="queue-role" text-anchor="middle">ARCHITECT TASKS</text>
+                <text x="103" y="344" class="queue-name">architect-tasks</text>
+                <text x="103" y="363" class="queue-detail">Activity Task Queue</text>
+                <circle cx="226" cy="341" r="4" fill="none" stroke="#159a9c"/><circle cx="226" cy="353" r="4" fill="none" stroke="#159a9c"/><circle cx="226" cy="365" r="4" fill="none" stroke="#159a9c"/>
+              </g>
+              <g>
+                <rect x="275" y="300" width="155" height="82" rx="3" class="queue-card"/>
+                <rect x="275" y="300" width="155" height="22" fill="#3c78a8"/>
+                <text x="352.5" y="315" class="queue-role" text-anchor="middle">RESEARCH TASKS</text>
+                <text x="288" y="344" class="queue-name">research-tasks</text>
+                <text x="288" y="363" class="queue-detail">Activity Task Queue</text>
+                <circle cx="411" cy="341" r="4" fill="none" stroke="#3c78a8"/><circle cx="411" cy="353" r="4" fill="none" stroke="#3c78a8"/><circle cx="411" cy="365" r="4" fill="none" stroke="#3c78a8"/>
+              </g>
+              <g>
+                <rect x="460" y="300" width="155" height="82" rx="3" class="queue-card"/>
+                <rect x="460" y="300" width="155" height="22" fill="#b54f77"/>
+                <text x="537.5" y="315" class="queue-role" text-anchor="middle">BUILDER TASKS</text>
+                <text x="473" y="344" class="queue-name">builder-tasks</text>
+                <text x="473" y="363" class="queue-detail">Activity Task Queue</text>
+                <circle cx="596" cy="341" r="4" fill="none" stroke="#b54f77"/><circle cx="596" cy="353" r="4" fill="none" stroke="#b54f77"/><circle cx="596" cy="365" r="4" fill="none" stroke="#b54f77"/>
+              </g>
+              <g>
+                <rect x="645" y="300" width="155" height="82" rx="3" class="queue-card"/>
+                <rect x="645" y="300" width="155" height="22" fill="#73549d"/>
+                <text x="722.5" y="315" class="queue-role" text-anchor="middle">CRITIC TASKS</text>
+                <text x="658" y="344" class="queue-name">critic-tasks</text>
+                <text x="658" y="363" class="queue-detail">Activity Task Queue</text>
+                <circle cx="781" cy="341" r="4" fill="none" stroke="#73549d"/><circle cx="781" cy="353" r="4" fill="none" stroke="#73549d"/><circle cx="781" cy="365" r="4" fill="none" stroke="#73549d"/>
+              </g>
+
+              <g>
+                <rect x="860" y="285" width="490" height="105" rx="3" class="control-card primary"/>
+                <rect x="860" y="285" width="64" height="105" fill="#159a9c"/>
+                <path d="M875 345h34M883 337l-8 8 8 8M901 337l8 8-8 8M892 321v48" class="icon-line"/>
+                <text x="944" y="307" class="elastic-type">IMPLEMENTATION COMPONENT</text>
+                <text x="944" y="332" class="elastic-title">Elasticity + placement controller</text>
+                <text x="944" y="353" class="elastic-detail">backlog · schedule-to-start latency · utilization · budget</text>
+                <text x="944" y="372" class="elastic-detail">residency · provider quota · cold start · configured warm minimum</text>
+              </g>
+              <path d="M800 341H860" class="metric-line"/>
+              <g class="edge-label"><rect x="790" y="311" width="92" height="22" rx="4" class="label-bg"/><text x="801" y="326" class="edge-text">QUEUE METRICS</text></g>
+              <path d="M965 199V285" class="policy-line"/>
+              <g class="edge-label"><rect x="974" y="230" width="120" height="22" rx="4" class="label-bg"/><text x="985" y="245" class="edge-text">PLACEMENT POLICY</text></g>
+
+              <!-- polling and placement buses -->
+              <path d="M445 382V454H220M445 454H1222" class="runtime-bus"/>
+              <path d="M220 454V516M555 454V516M890 454V516M1222 454V516" class="runtime-bus"/>
+              <g class="edge-label"><rect x="260" y="430" width="144" height="22" rx="4" class="label-bg"/><text x="271" y="445" class="edge-text">TASK POLLING + DISPATCH</text></g>
+              <path d="M1105 390V478H240M1105 478H1242" class="placement-line"/>
+              <path d="M240 478V516M575 478V516M910 478V516M1242 478V516" class="placement-line"/>
+              <g class="edge-label"><rect x="835" y="458" width="130" height="22" rx="4" class="label-bg"/><text x="846" y="473" class="edge-text">SCALE · PLACE · DRAIN</text></g>
+
+              <!-- hybrid execution cells -->
+              <g>
+                <rect x="60" y="500" width="320" height="252" class="cloud-cell onprem"/>
+                <rect x="60" y="500" width="320" height="34" fill="#555" class="cloud-band"/>
+                <text x="76" y="520" class="cloud-band-title">ON-PREMISES EXECUTION CELL</text>
+                <text x="76" y="547" class="cloud-subtitle">sensitive · data-local · privileged access</text>
+                <rect x="80" y="559" width="280" height="62" rx="3" class="pool-card primary"/>
+                <rect x="80" y="559" width="50" height="62" fill="#555"/>
+                <path d="M94 578h22M94 586h22M94 594h22M99 574v25M111 574v25" class="icon-line"/>
+                <text x="144" y="578" class="elastic-type">ACTIVITY WORKERS</text><text x="144" y="598" class="elastic-title">Specialist pool</text><text x="144" y="613" class="elastic-detail">eligible role queues</text>
+                <text x="326" y="586" class="count" text-anchor="middle">0-N</text><text x="326" y="605" class="count-caption" text-anchor="middle">REPLICAS</text>
+                <rect x="80" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="145" y="659" class="elastic-title" text-anchor="middle">LiteLLM</text><text x="145" y="677" class="elastic-detail" text-anchor="middle">model access</text>
+                <rect x="230" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="295" y="659" class="elastic-title" text-anchor="middle">MCP host</text><text x="295" y="677" class="elastic-detail" text-anchor="middle">tool access</text>
+                <rect x="80" y="704" width="280" height="31" rx="3" class="endpoint-card"/><text x="220" y="724" class="elastic-detail" text-anchor="middle">Local models · private systems · sandboxed tools</text>
+                <path d="M220 621V630H145V639M220 630H295V639M145 687V695H220V704M295 687V695H220" class="internal-line"/>
+              </g>
+
+              <g>
+                <rect x="395" y="500" width="320" height="252" class="cloud-cell aws"/>
+                <rect x="395" y="500" width="320" height="34" fill="#8c6d49" class="cloud-band"/>
+                <text x="411" y="520" class="cloud-band-title">AWS EXECUTION CELL</text>
+                <text x="411" y="547" class="cloud-subtitle">EKS · ECS · EC2</text>
+                <rect x="415" y="559" width="280" height="62" rx="3" class="pool-card primary"/>
+                <rect x="415" y="559" width="50" height="62" fill="#8c6d49"/>
+                <path d="M429 578h22M429 586h22M429 594h22M434 574v25M446 574v25" class="icon-line"/>
+                <text x="479" y="578" class="elastic-type">ACTIVITY WORKERS</text><text x="479" y="598" class="elastic-title">Specialist pool</text><text x="479" y="613" class="elastic-detail">eligible role queues</text>
+                <text x="661" y="586" class="count" text-anchor="middle">0-N</text><text x="661" y="605" class="count-caption" text-anchor="middle">REPLICAS</text>
+                <rect x="415" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="480" y="659" class="elastic-title" text-anchor="middle">LiteLLM</text><text x="480" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="565" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="630" y="659" class="elastic-title" text-anchor="middle">MCP host</text><text x="630" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="415" y="704" width="280" height="31" rx="3" class="endpoint-card"/><text x="555" y="724" class="elastic-detail" text-anchor="middle">Bedrock · SageMaker · GPU endpoints · tools</text>
+                <path d="M555 621V630H480V639M555 630H630V639M480 687V695H555V704M630 687V695H555" class="internal-line"/>
+              </g>
+
+              <g>
+                <rect x="730" y="500" width="320" height="252" class="cloud-cell azure"/>
+                <rect x="730" y="500" width="320" height="34" fill="#3c78a8" class="cloud-band"/>
+                <text x="746" y="520" class="cloud-band-title">AZURE EXECUTION CELL</text>
+                <text x="746" y="547" class="cloud-subtitle">AKS · VM scale sets</text>
+                <rect x="750" y="559" width="280" height="62" rx="3" class="pool-card primary"/>
+                <rect x="750" y="559" width="50" height="62" fill="#3c78a8"/>
+                <path d="M764 578h22M764 586h22M764 594h22M769 574v25M781 574v25" class="icon-line"/>
+                <text x="814" y="578" class="elastic-type">ACTIVITY WORKERS</text><text x="814" y="598" class="elastic-title">Specialist pool</text><text x="814" y="613" class="elastic-detail">eligible role queues</text>
+                <text x="996" y="586" class="count" text-anchor="middle">0-N</text><text x="996" y="605" class="count-caption" text-anchor="middle">REPLICAS</text>
+                <rect x="750" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="815" y="659" class="elastic-title" text-anchor="middle">LiteLLM</text><text x="815" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="900" y="639" width="130" height="48" rx="3" class="gateway-card"/><text x="965" y="659" class="elastic-title" text-anchor="middle">MCP host</text><text x="965" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="750" y="704" width="280" height="31" rx="3" class="endpoint-card"/><text x="890" y="724" class="elastic-detail" text-anchor="middle">Azure OpenAI · Azure AI · GPU endpoints · tools</text>
+                <path d="M890 621V630H815V639M890 630H965V639M815 687V695H890V704M965 687V695H890" class="internal-line"/>
+              </g>
+
+              <g>
+                <rect x="1065" y="500" width="315" height="252" class="cloud-cell gcp"/>
+                <rect x="1065" y="500" width="315" height="34" fill="#73549d" class="cloud-band"/>
+                <text x="1081" y="520" class="cloud-band-title">GOOGLE CLOUD EXECUTION CELL</text>
+                <text x="1081" y="547" class="cloud-subtitle">GKE · managed instance groups</text>
+                <rect x="1085" y="559" width="275" height="62" rx="3" class="pool-card primary"/>
+                <rect x="1085" y="559" width="50" height="62" fill="#73549d"/>
+                <path d="M1099 578h22M1099 586h22M1099 594h22M1104 574v25M1116 574v25" class="icon-line"/>
+                <text x="1149" y="578" class="elastic-type">ACTIVITY WORKERS</text><text x="1149" y="598" class="elastic-title">Specialist pool</text><text x="1149" y="613" class="elastic-detail">eligible role queues</text>
+                <text x="1326" y="586" class="count" text-anchor="middle">0-N</text><text x="1326" y="605" class="count-caption" text-anchor="middle">REPLICAS</text>
+                <rect x="1085" y="639" width="128" height="48" rx="3" class="gateway-card"/><text x="1149" y="659" class="elastic-title" text-anchor="middle">LiteLLM</text><text x="1149" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="1232" y="639" width="128" height="48" rx="3" class="gateway-card"/><text x="1296" y="659" class="elastic-title" text-anchor="middle">MCP host</text><text x="1296" y="677" class="elastic-detail" text-anchor="middle">regional instance</text>
+                <rect x="1085" y="704" width="275" height="31" rx="3" class="endpoint-card"/><text x="1222.5" y="724" class="elastic-detail" text-anchor="middle">Vertex AI · GPU endpoints · tools</text>
+                <path d="M1222 621V630H1149V639M1222 630H1296V639M1149 687V695H1222V704M1296 687V695H1222" class="internal-line"/>
+              </g>
+
+              <!-- metrics return to placement control -->
+              <path d="M220 735V768H1105V390M555 735V768M890 735V768M1222 735V768" class="metric-line"/>
+              <g class="edge-label"><rect x="923" y="748" width="160" height="22" rx="4" class="label-bg"/><text x="934" y="763" class="edge-text">UTILIZATION · COST · LATENCY</text></g>
+
+              <!-- capability lifecycle -->
+              <rect x="60" y="790" width="1320" height="108" class="lifecycle-band"/>
+              <g class="zone-heading"><rect x="72" y="798" width="185" height="24" rx="3" class="zone-label-bg"/><text x="82" y="815" class="zone-label">CAPABILITY LIFECYCLE</text></g>
+              <g><rect x="82" y="833" width="230" height="48" rx="3" class="phase"/><text x="95" y="852" class="phase-title">1 · IDLE</text><text x="95" y="871" class="phase-detail">control warm · pools 0/min</text></g>
+              <g><rect x="342" y="833" width="230" height="48" rx="3" class="phase"/><text x="355" y="852" class="phase-title">2 · DEMAND</text><text x="355" y="871" class="phase-detail">role queues accumulate work</text></g>
+              <g><rect x="602" y="833" width="230" height="48" rx="3" class="phase active"/><text x="615" y="852" class="phase-title">3 · SCALE OUT</text><text x="615" y="871" class="phase-detail">eligible cells start 0-N capacity</text></g>
+              <g><rect x="862" y="833" width="230" height="48" rx="3" class="phase active"/><text x="875" y="852" class="phase-title">4 · EXECUTE</text><text x="875" y="871" class="phase-detail">model + tool Activities return evidence</text></g>
+              <g><rect x="1122" y="833" width="230" height="48" rx="3" class="phase"/><text x="1135" y="852" class="phase-title">5 · DRAIN</text><text x="1135" y="871" class="phase-detail">cooldown · return to 0/min</text></g>
+              <path d="M312 857H342M572 857H602M832 857H862M1092 857H1122" class="phase-arrow"/>
+            </svg>
+          </div>
+          <div class="diagram-note">Swipe horizontally to inspect the deployment view at a readable scale.</div>
+          <div class="diagram-assurance"><strong>Deployment and scaling constraints.</strong> Temporal Task Queues retain Workflow and Activity Tasks when Workers are unavailable, and Workers poll only when they have capacity. Temporal Cloud manages the Temporal Service, not the application Workers shown in the execution cells. The elasticity and placement controller is an implementation component that connects Temporal metrics and policy to Kubernetes or cloud autoscalers. The named cloud products are representative implementation options, not required components. A 0-N pool is possible only where the runtime and cold-start objective permit it; maintain a warm minimum for latency-sensitive orchestration, slow-loading models, or privileged access. Results return through the same Task Queue path, and large artifacts remain outside Workflow Event History.</div>
+          <div class="legend" aria-label="Elastic deployment diagram legend"><span><i></i>Task scheduling or dispatch</span><span><i class="dashed"></i>Policy dependency</span><span><i style="border-color:#796b87;border-top-style:dotted"></i>Scaling metric</span><span><i style="border-color:#159a9c;border-top-style:dashed"></i>Placement or scale command</span><span><i class="boundary"></i>Execution cell</span></div>
+        </figure>
+      </div>
+    </section>
+
     <section id="operating-model">
       <div class="content">
         <div class="section-head"><div><span class="section-label">Operating model</span><h2>Persistent definitions. Ephemeral teams.</h2></div><p>The organization definition is a versioned application artifact. Each objective can create a temporary set of specialist worker nodes operating under explicit policy; this behavior is implemented by the application graph rather than supplied automatically by any one platform.</p></div>
@@ -448,25 +715,35 @@
           <article class="detail"><span>06</span><div><h3>Tools and isolation</h3><p>An MCP host creates clients that communicate with focused servers and must enforce consent and security policy. Git worktrees separate working directories and branches; they are not security sandboxes. Use containers or equivalent process isolation for untrusted execution.</p></div></article>
           <article class="detail"><span>07</span><div><h3>State and evidence</h3><p>Temporal owns durable Workflow Event History. PostgreSQL and artifact storage are optional application choices for cross-run state and retained evidence; they do not replace Temporal durability or a LangGraph checkpointer within the official integration.</p></div></article>
           <article class="detail"><span>08</span><div><h3>Evaluation and telemetry</h3><p>Completion policy can combine deterministic tests, evidence requirements, model-based review, and human approval. OpenTelemetry instrumentation emits and propagates telemetry; an external observability backend stores, queries, and visualizes it.</p></div></article>
+          <article class="detail"><span>09</span><div><h3>Capability Task Queues</h3><p>Temporal Task Queues are durable demand buffers polled by one or more Worker processes. Separating Architect, Research, Builder, and Critic Activity work into capability-oriented queues is an application design choice that enables independent routing, throttling, and fleet scaling.</p></div></article>
+          <article class="detail"><span>10</span><div><h3>Elastic Worker pools</h3><p>Activity Worker replicas can scale independently from the Temporal Service and the small control-Worker pool. Replica count, task slots, and poller count are separate controls; scale from backlog and schedule-to-start latency while respecting downstream provider quotas.</p></div></article>
+          <article class="detail"><span>11</span><div><h3>Hybrid placement</h3><p>A custom placement controller can combine capability, residency, security, latency, cost, quota, and cold-start policy to select eligible on-premises or cloud execution cells. Temporal and LangGraph do not provide this multi-cloud placement policy automatically.</p></div></article>
+          <article class="detail"><span>12</span><div><h3>Scale-in safety</h3><p>Workers should stop accepting new work, finish or safely abandon in-flight Activities, and drain before infrastructure termination. Scale-to-zero is appropriate only when startup latency is acceptable; slow model loading and privileged workloads may require a configured warm minimum.</p></div></article>
         </div>
       </div>
     </section>
 
     <section id="validation">
       <div class="content">
-        <div class="section-head"><div><span class="section-label">Reference check</span><h2>Validated against current sources</h2></div><p>Platform capabilities and constraints were checked against current first-party documentation on 5 September 2026. The portable organization schema, capability registry, completion policy, agent-role taxonomy, and combined operating model are explicitly identified as architectural design choices. Research evidence is labeled separately and does not constitute a platform guarantee.</p></div>
+        <div class="section-head"><div><span class="section-label">Reference check</span><h2>Validated against current sources</h2></div><p>Platform capabilities, deployment boundaries, and cloud scaling mechanisms were checked against current first-party documentation on 5 September 2026. The organization schema, capability queues, placement controller, completion policy, agent-role taxonomy, and combined operating model are explicitly identified as architectural design choices. Research evidence is labeled separately and does not constitute a platform guarantee.</p></div>
         <div class="references">
           <article class="reference"><span class="status">Platform fact</span><h3>LangGraph</h3><p>StateGraph provides explicit state and controlled graph transitions; its Send API supports dynamically created worker nodes for orchestrator-worker flows.</p><a href="https://docs.langchain.com/oss/python/langgraph/workflows-agents">Worker pattern ↗</a></article>
           <article class="reference"><span class="status">Preview constraint</span><h3>Temporal + LangGraph</h3><p>The official integration is Python and Public Preview. Each graph node or task must declare Workflow or Activity execution; LLM, network, database, and file I/O run as Activities.</p><a href="https://docs.temporal.io/develop/python/integrations/langgraph">Integration guide ↗</a></article>
           <article class="reference"><span class="status">Platform fact</span><h3>Temporal Service</h3><p>Temporal persists application state and supplies Workflow Event History, Task Queues, timers, Signals, and retry coordination so executions can resume after infrastructure failure.</p><a href="https://docs.temporal.io/">Platform docs ↗</a></article>
           <article class="reference"><span class="status">Platform fact</span><h3>Temporal Activities</h3><p>Activities contain failure-prone or nondeterministic operations. Temporal recommends idempotency because an Activity can execute more than once before completion is recorded.</p><a href="https://docs.temporal.io/activity-definition">Activity semantics ↗</a></article>
-          <article class="reference"><span class="status">Platform fact</span><h3>LiteLLM</h3><p>The gateway supports a common multi-provider interface, authentication and authorization, routing, fallback, rate limits, spend tracking, and budgets.</p><a href="https://docs.litellm.ai/">Gateway docs ↗</a></article>
+          <article class="reference"><span class="status">Platform fact</span><h3>LiteLLM</h3><p>The gateway supports a common multi-provider interface, authentication and authorization, routing, fallback, rate limits, spend tracking, and budgets. Its current provider catalog includes Bedrock, SageMaker, Azure OpenAI, Azure AI, and Vertex AI.</p><a href="https://docs.litellm.ai/docs/providers">Provider catalog ↗</a></article>
           <article class="reference"><span class="status">Current spec</span><h3>MCP 2026-07-28</h3><p>MCP retains a host-client-server architecture but now has a stateless protocol core: each request carries its version and client capabilities.</p><a href="https://modelcontextprotocol.io/specification/2026-07-28/architecture">Architecture spec ↗</a></article>
           <article class="reference"><span class="status">Security duty</span><h3>MCP tools</h3><p>Servers validate inputs and enforce access controls; clients confirm sensitive operations, validate results, apply timeouts, and log tool use. These are implementation duties, not automatic protocol guarantees.</p><a href="https://modelcontextprotocol.io/specification/2026-07-28/server/tools">Tool security ↗</a></article>
           <article class="reference"><span class="status">Platform fact</span><h3>Git worktrees</h3><p>Worktrees provide multiple working trees attached to one shared repository. The documented mechanism separates Git working state; process and security isolation require another control.</p><a href="https://git-scm.com/docs/git-worktree.html">Git manual ↗</a></article>
           <article class="reference"><span class="status">Platform fact</span><h3>OpenTelemetry</h3><p>OpenTelemetry generates, collects, and exports traces, metrics, and logs. It is not an observability backend; storage and visualization belong to other tools.</p><a href="https://opentelemetry.io/docs/what-is-opentelemetry/">OTel overview ↗</a></article>
           <article class="reference"><span class="status">Research evidence</span><h3>Evaluator independence</h3><p>Current research reports self- and same-family preference in LLM judges. Independent judges and deterministic checks mitigate risk but do not prove correctness.</p><a href="https://arxiv.org/abs/2604.06996">Bias study ↗</a></article>
           <article class="reference"><span class="status">Diagram standard</span><h3>Scope boundaries</h3><p>C4 distinguishes the software system in scope from external systems and reserves deployment details for deployment diagrams. This page therefore labels its view and external dependencies explicitly.</p><a href="https://c4model.com/diagrams/container">C4 guidance ↗</a></article>
+          <article class="reference"><span class="status">Platform fact</span><h3>Temporal Task Queues</h3><p>Task Queues are lightweight and created on demand. Workers poll when they have capacity; Workflow and Activity Tasks persist when Workers are unavailable, and queues load-balance work across Worker processes.</p><a href="https://docs.temporal.io/task-queue">Task Queue semantics ↗</a></article>
+          <article class="reference"><span class="status">Implementation guidance</span><h3>Temporal Worker capacity</h3><p>Temporal distinguishes Worker replicas, task slots, and pollers. Current guidance covers backlog metrics, resource-based slot suppliers, and poller autoscaling for managing Worker fleet throughput.</p><a href="https://docs.temporal.io/develop/worker-performance">Worker performance ↗</a></article>
+          <article class="reference"><span class="status">Deployment boundary</span><h3>Temporal Cloud</h3><p>Temporal Cloud manages Temporal Server capabilities but does not run customer applications or Workers. Worker programs execute in customer-controlled containers, Kubernetes clusters, virtual machines, or other hosting environments.</p><a href="https://docs.temporal.io/cloud/security#code-execution-boundaries">Cloud security model ↗</a></article>
+          <article class="reference"><span class="status">Cloud mapping</span><h3>AWS elastic execution</h3><p>AWS documents event-driven scaling on EKS with custom metrics and KEDA, including GPU inference scaling from queue depth and latency. Node capacity can scale through EKS Auto Mode, Karpenter, or Cluster Autoscaler.</p><a href="https://docs.aws.amazon.com/eks/latest/userguide/ml-inference-autoscaling-hpa-keda.html">EKS AI autoscaling ↗</a></article>
+          <article class="reference"><span class="status">Cloud mapping</span><h3>Azure elastic execution</h3><p>AKS supports pod, node, and event-driven scaling through HPA, cluster autoscaling, node autoprovisioning, and KEDA. KEDA is the relevant mechanism when an external backlog should activate workloads or permit scale-to-zero.</p><a href="https://learn.microsoft.com/en-us/azure/aks/concepts-scale">AKS scaling overview ↗</a></article>
+          <article class="reference"><span class="status">Cloud mapping</span><h3>Google Cloud elastic execution</h3><p>GKE can scale workloads from custom, Prometheus, or external metrics. Google documents queue backlog as an example signal for increasing replicas while work accumulates and reducing them as demand falls.</p><a href="https://cloud.google.com/kubernetes-engine/docs/concepts/custom-and-external-metrics">GKE metric autoscaling ↗</a></article>
         </div>
       </div>
     </section>
@@ -490,14 +767,15 @@
     window.addEventListener("scroll", updateBackToTop, { passive: true });
 
     function promoteDiagramForeground() {
-      var diagram = document.querySelector(".diagram");
-      var completionGate = diagram.querySelector(".completion-gate");
-      if (completionGate) diagram.appendChild(completionGate);
-      Array.from(diagram.querySelectorAll(".zone-heading")).forEach(function (heading) {
-        diagram.appendChild(heading);
-      });
-      Array.from(diagram.querySelectorAll(".edge-label")).forEach(function (label) {
-        diagram.appendChild(label);
+      document.querySelectorAll(".diagram").forEach(function (diagram) {
+        var completionGate = diagram.querySelector(".completion-gate");
+        if (completionGate) diagram.appendChild(completionGate);
+        Array.from(diagram.querySelectorAll(".zone-heading")).forEach(function (heading) {
+          diagram.appendChild(heading);
+        });
+        Array.from(diagram.querySelectorAll(".edge-label")).forEach(function (label) {
+          diagram.appendChild(label);
+        });
       });
     }
     promoteDiagramForeground();
