@@ -125,17 +125,20 @@ $(window).load(function () {
 
 //activate collapse right menu when the windows is resized 
 $(window).resize(function () {
+    window_width = $(window).width();
+    window_height = $(window).height();
+
     // Width may have crossed the hero's 1280px breakpoint, which changes
     // --hero-zoom; drop the cached value so the next frame re-reads it.
     $('.parallax > img').removeData('resolvedZoom');
 
-    if ($(window).width() < 992) {
+    if (window_width < 992) {
         rubik.initRightMenu();
         rubik.checkResponsiveImage();
-    }
-    if ($(window).width() > 992 && !burger_menu) {
+    } else if (!burger_menu) {
+        rubik.closeRightMenu();
+        $('body > .mobile-nav-drawer').remove();
         $('nav[role="navigation"]').removeClass('navbar-burger');
-        rubik.misc.navbar_menu_visible = 1;
         navbar_initialized = false;
     }
 });
@@ -163,19 +166,11 @@ $(document).on('click', 'a[data-scroll="true"]', function (e) {
         $('html, body').animate({
             scrollTop: $(scroll_target).offset().top - 50
         }, 1000, function() {
-            console.log('Scroll animation complete'); // Debug log
-
             // Collapse the navbar if the toggle button is visible (i.e., on mobile)
             if ($('.navbar-toggle').is(':visible')) {
-                console.log('Navbar toggle is visible, collapsing the navbar...'); // Debug log
-
                 $('.navbar-collapse').collapse('hide');  // Collapse the navbar
                 $('html').removeClass('nav-open');       // Remove 'nav-open' from <html>
                 $('.navbar-toggle').removeClass('toggled'); // Remove the toggled state from the navbar button
-
-                console.log('Navbar collapse attempted, nav-open class removed'); // Debug log
-            } else {
-                console.log('Navbar toggle not visible, no need to collapse'); // Debug log
             }
         });
     }
@@ -231,7 +226,9 @@ rubik = {
             $nav = $('nav[role="navigation"]');
             $nav.addClass('navbar-burger');
 
-            $navbar = $nav.find('.navbar-collapse').first().clone(true);
+            $('body > .mobile-nav-drawer').remove();
+            $navbar = $nav.find('.navbar-collapse').first().clone(false)
+                .addClass('mobile-nav-drawer');
 
             ul_content = '';
 
@@ -284,7 +281,7 @@ rubik = {
             });
 
 
-            $toggle.click(function () {
+            $toggle.off('click.rubikMenu').on('click.rubikMenu', function () {
 
                 if (rubik.misc.navbar_menu_visible == 1) {
                     rubik.closeRightMenu();

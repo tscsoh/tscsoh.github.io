@@ -58,7 +58,7 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
   color: #fff;
   font-family: "Slim-Joe", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: clamp(26px, 3vw, 40px);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.05;
   text-transform: uppercase;
@@ -115,23 +115,6 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 /* ---- hero portrait ------------------------------------------
    Crop/darken the hero photo to match the previous photo's
    moody, tightly-cropped treatment. */
-/* Mobile browsers resize their visible viewport as the address bar
-   collapses/expands on scroll, and plain vh units are recalculated
-   against that changing height - so a section sized in vh visibly
-   grows or shrinks a moment into every scroll. svh ("small viewport
-   height") is pinned to the viewport size when browser chrome is
-   fully shown and never changes, eliminating the jump. Declared
-   after the vh fallback so unsupported browsers still get a height. */
-#home.parallax {
-  height: 100vh;
-  height: 100svh;
-}
-@media (max-width: 768px) {
-  #home.parallax {
-    height: 80vh;
-    height: 80svh;
-  }
-}
 #home.parallax > img {
   --hero-zoom: 1.6;
   object-fit: cover;
@@ -162,26 +145,6 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
     object-position: 50% 14%;
     transform-origin: 50% 14%;
   }
-  /* The hero copy sits at a percentage of hero *height* while the photo's
-     scale is driven by hero *width*, so the two drift apart as the aspect
-     ratio changes: on 16:10 desktops the title settled onto the eye line.
-     Lifting it 6% clears the eyes at every wide aspect ratio. Scoped to
-     the same breakpoint so mobile and tablet keep the template's 44%. */
-  #home .content {
-    top: 38%;
-  }
-}
-/* "AI PLATFORM ARCHITECT" needs about 1570px of line box at this type size,
-   so below roughly 1590px (measured: it wraps at 1580, fits at 1600) the
-   title breaks to two lines. .content is centred on its top offset, so a
-   second line hangs half a line-height lower than a single one would and
-   lands squarely on the glasses. Lift the copy a further 6% across the
-   band that wraps, putting the last line back on the brow - the same
-   relationship the one-line widths above it have. */
-@media (min-width: 1280px) and (max-width: 1599px) {
-  #home .content {
-    top: 32%;
-  }
 }
 /* Below ~992px width, script.js swaps the <img> above for a plain
    background-image div (see checkResponsiveImage in script.js) -
@@ -203,12 +166,62 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
 }
 
 /* ---- hero title + contact info (luxury pass) -----------------
-   The template's default hard 3D drop-shadow on the hero title
-   reads as dated; a single soft lift keeps it legible over the
-   photo without the "stamped" look. */
-#home .section-header h1,
-.section-header h1 {
+   Keep the long role on two balanced lines until the complete title
+   genuinely fits, then use one line on wide screens. The theme's
+   em-based font sizes made the title jump between arbitrary wraps. */
+#home > .container {
+  left: 50%;
+  width: 100%;
+  max-width: 2400px;
+  padding-right: clamp(15px, 2.5vw, 40px);
+  padding-left: clamp(15px, 2.5vw, 40px);
+  transform: translateX(-50%);
+}
+#home h1.responsive-small {
+  width: 100%;
+  margin: 0;
+  font-size: clamp(18px, min(6.25vw, 13vh), 82px) !important;
+  font-weight: 100;
+  letter-spacing: 0.065em;
+  line-height: 1.06;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+#home .hero-title-line {
+  display: block;
+  white-space: nowrap;
+}
+@media (min-width: 1900px) {
+  #home .hero-title-line {
+    display: inline;
+  }
+  #home .hero-title-line + .hero-title-line {
+    margin-left: 0.32em;
+  }
+}
+#home .separator {
+  margin: clamp(14px, 3vh, 30px) auto;
+}
+/* Keep the original 80vh mobile header in landscape. Compact the copy
+   instead of making the header taller or shifting the whole stack down,
+   so the next section still starts at the theme's normal boundary. */
+@media (max-height: 500px) and (orientation: landscape) {
+  #home h1.responsive-small {
+    font-size: clamp(22px, 4.8vw, 32px) !important;
+    line-height: 1.02;
+  }
+  #home .separator {
+    margin: 6px auto;
+  }
+  #home .content h5 {
+    font-size: 12px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  #home .content > a.btn-social {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    line-height: 1;
+  }
 }
 /* Slim-Joe (the hero display font, also used for the "Todd Swepston"
    navbar brand) only ships one weight - thin - and there's no bold

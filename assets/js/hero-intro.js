@@ -15,26 +15,6 @@
 (function () {
   "use strict";
 
-  // Locks the hero's height to a plain pixel value computed once, instead
-  // of leaving it sized by svh/vh. svh is supposed to stay fixed while
-  // Safari's address bar hides/shows on scroll, but on some iOS versions
-  // the element still visibly jitters through that exact transition -
-  // confirmed via a frame-by-frame recording where the hero repeatedly
-  // snapped in and out for a few seconds right as the user started
-  // scrolling. A height in px has nothing left to recalculate, so there's
-  // nothing for the toolbar animation to jitter. Only re-measured on an
-  // actual device rotation, not on every resize (the toolbar hide/show
-  // that caused this in the first place also fires as a resize event).
-  function lockHeroHeight() {
-    var hero = document.getElementById('home');
-    if (!hero || window.innerWidth > 768) { return; }
-    hero.style.height = Math.round(window.innerHeight * 0.8) + 'px';
-  }
-  lockHeroHeight();
-  window.addEventListener('orientationchange', function () {
-    setTimeout(lockHeroHeight, 300);
-  });
-
   var reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var h1 = document.querySelector('#home h1.responsive-small');
@@ -42,6 +22,13 @@
 
   function splitTitle() {
     var text = h1.getAttribute('aria-label') || h1.textContent;
+    var lineTexts = Array.prototype.map.call(
+      h1.querySelectorAll('.hero-title-line'),
+      function (line) { return line.textContent.trim(); }
+    ).filter(Boolean);
+
+    if (!lineTexts.length) { lineTexts = [text.trim()]; }
+
     var wrapper = document.createElement('span');
     wrapper.className = 'hero-title-intro';
     wrapper.setAttribute('aria-hidden', 'true');
@@ -49,30 +36,38 @@
     var delay = 0;
     var step = 0.028;
 
-    // Each word is its own inline-block unit so line-wrapping only ever
-    // happens between words, never mid-word between two character spans.
-    var words = text.split(' ');
-    words.forEach(function (word, wi) {
-      var wordSpan = document.createElement('span');
-      wordSpan.className = 'hero-word';
-      word.split('').forEach(function (ch) {
-        var span = document.createElement('span');
-        span.className = 'hero-char';
-        span.textContent = ch;
-        span.style.animationDelay = delay.toFixed(3) + 's';
-        wordSpan.appendChild(span);
-        delay += step;
-      });
-      wrapper.appendChild(wordSpan);
+    // Preserve the deliberate line groups from the HTML while still
+    // animating each character. This prevents the spans from changing
+    // the title's wrapping after JavaScript runs.
+    lineTexts.forEach(function (lineText) {
+      var lineSpan = document.createElement('span');
+      lineSpan.className = 'hero-title-line';
+      var words = lineText.split(/\s+/);
 
-      if (wi < words.length - 1) {
-        var spaceSpan = document.createElement('span');
-        spaceSpan.className = 'hero-char space';
-        spaceSpan.textContent = ' ';
-        spaceSpan.style.animationDelay = delay.toFixed(3) + 's';
-        wrapper.appendChild(spaceSpan);
-        delay += step;
-      }
+      words.forEach(function (word, wi) {
+        var wordSpan = document.createElement('span');
+        wordSpan.className = 'hero-word';
+        word.split('').forEach(function (ch) {
+          var span = document.createElement('span');
+          span.className = 'hero-char';
+          span.textContent = ch;
+          span.style.animationDelay = delay.toFixed(3) + 's';
+          wordSpan.appendChild(span);
+          delay += step;
+        });
+        lineSpan.appendChild(wordSpan);
+
+        if (wi < words.length - 1) {
+          var spaceSpan = document.createElement('span');
+          spaceSpan.className = 'hero-char space';
+          spaceSpan.textContent = ' ';
+          spaceSpan.style.animationDelay = delay.toFixed(3) + 's';
+          lineSpan.appendChild(spaceSpan);
+          delay += step;
+        }
+      });
+
+      wrapper.appendChild(lineSpan);
     });
 
     h1.setAttribute('aria-label', text);

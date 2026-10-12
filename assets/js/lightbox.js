@@ -28,6 +28,12 @@
   }
 
   function close() {
+    // Move focus out of the dialog before hiding it. Setting aria-hidden
+    // while the close button still owns focus is blocked by browsers and
+    // leaves assistive technology with an inconsistent dialog state.
+    if (lightbox.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     lightbox.classList.remove('open');
     lightbox.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('noscroll');
