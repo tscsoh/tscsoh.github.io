@@ -440,3 +440,32 @@ a:focus, a:active, .btn:focus, .btn:active, .btn:focus:active {
     margin-top: -8%;
   }
 }
+
+/* ---- stacked embeds ----------------------------------------- */
+/* The embeds carry height="500" for the two-column desktop layout. Once
+   the columns stack, a phone-width box that tall letterboxes every video
+   with large black bars, so let the media keep its own aspect ratio. */
+@media (max-width: 991px) {
+  .section-we-made-1 iframe {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .section-we-made-1 video {
+    height: auto;
+    background: #000;
+  }
+}
+
+/* ---- full-bleed project rows below 992px --------------------- */
+/* styles.css only zeroes these rows' negative margin and the columns'
+   padding from 992px up. Below that the row's -15px margins push it 15px
+   past the viewport edge, which gives tablets a sideways scroll. The
+   margin and padding cancel out visually, so zero both at every width. */
+.section-we-made-1 .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.section-we-made-1 .row [class^="col-"] {
+  padding-left: 0;
+  padding-right: 0;
+}
